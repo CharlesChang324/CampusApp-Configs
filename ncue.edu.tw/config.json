@@ -1,380 +1,380 @@
 {
-    "schoolId": "ncue.edu.tw",
-    "schoolName": "彰化師範大學",
-    "logoPath": "https://www.ncue.edu.tw/var/file/0/1000/img/85/416208730.jpg",
-    "calendar": {
-        "type": "pdf",
-        "url": "https://aps.ncue.edu.tw/odedi/attch/M20/14/1406230041.pdf"
-    },
-    "auth": {
-        "entryUrl": "https://nam.ncue.edu.tw/nidp/idff/sso?id=Form&sid=0&option=credential&sid=0&target=https://portal.ncue.edu.tw/portal/home.php",
-        "successIndicators": [
-            {
-                "type": "exact",
-                "value": "https://portal.ncue.edu.tw"
-            },
-            {
-                "type": "exact",
-                "value": "http://portal.ncue.edu.tw"
-            },
-            {
-                "type": "startsWith",
-                "value": "https://webapss.ncue.edu.tw/Student"
-            },
-            {
-                "type": "startsWith",
-                "value": "https://webap2s.ncue.edu.tw/Student"
-            },
-            {
-                "type": "startsWith",
-                "value": "https://webap3s.ncue.edu.tw/Student"
-            }
-        ],
-        "loginIndicators": [
-            {
-                "type": "startsWith",
-                "value": "https://nam.ncue.edu.tw"
-            }
-        ],
-        "usernameSelector": "#Ecom_User_ID",
-        "passwordSelector": "#Ecom_Password",
-        "submitSelector": "button[name=\"LoginButton\"]",
-        "autoFill": true,
-        "autoSubmit": true,
-        "verifyScript": ""
-    },
-    "schedule": {
-        "syncMode": "auto",
-        "entryUrl": "https://webap2s.ncue.edu.tw/Student/baseuser/LoginSSO",
-        "targetUrlIndicators": [
-            {
-                "type": "contains",
-                "value": "SB020"
-            }
-        ],
-        "sessionExpiredIndicators": [
-            {
-                "type": "contains",
-                "value": "nam.ncue.edu.tw"
-            },
-            {
-                "type": "contains",
-                "value": "nidp/idff/sso"
-            }
-        ],
-        "timeSlots": [
-            {
-                "s": "1",
-                "t": "08:10~09:00"
-            },
-            {
-                "s": "2",
-                "t": "09:05~09:55"
-            },
-            {
-                "s": "3",
-                "t": "10:15~11:05"
-            },
-            {
-                "s": "4",
-                "t": "11:10~12:00"
-            },
-            {
-                "s": "14",
-                "t": "12:05~12:55"
-            },
-            {
-                "s": "5",
-                "t": "13:10~14:00"
-            },
-            {
-                "s": "6",
-                "t": "14:05~14:55"
-            },
-            {
-                "s": "7",
-                "t": "15:15~16:05"
-            },
-            {
-                "s": "8",
-                "t": "16:10~17:00"
-            },
-            {
-                "s": "9",
-                "t": "17:10~18:00"
-            },
-            {
-                "s": "10",
-                "t": "18:20~19:10"
-            },
-            {
-                "s": "11",
-                "t": "19:15~20:05"
-            },
-            {
-                "s": "12",
-                "t": "20:10~21:00"
-            },
-            {
-                "s": "13",
-                "t": "21:05~21:55"
-            }
-        ],
-        "switchScript": "(function() {\n  if (window._isSwitching) return;\n  var modals = document.querySelectorAll('.modal.show');\n  if (modals.length > 0) {\n    modals.forEach(function(m) { m.classList.remove('show'); m.style.display = 'none'; });\n    document.querySelectorAll('.modal-backdrop').forEach(function(b) { b.remove(); });\n    document.body.classList.remove('modal-open');\n  }\n  var yearSelect = document.getElementById('ddl_yms_year');\n  var semSelect = document.getElementById('ddl_yms_smester');\n  var btn = document.querySelector('button[name=\"PGcmd\"][value=\"查詢\"]');\n  if(yearSelect && semSelect && btn) {\n    var currentY = yearSelect.value;\n    var currentS = semSelect.value;\n    if(currentY !== '{{TARGET_YEAR}}' || currentS !== '{{TARGET_SEM}}') {\n      window._isSwitching = true;\n      yearSelect.value = '{{TARGET_YEAR}}';\n      semSelect.value = '{{TARGET_SEM}}';\n      yearSelect.dispatchEvent(new Event('change', { bubbles: true }));\n      semSelect.dispatchEvent(new Event('change', { bubbles: true }));\n      setTimeout(function() { btn.click(); }, 300);\n    }\n  }\n})();",
-        "parseScript": "(function() {\n  if (window._hasSentData) return;\n  if (document.querySelector('.modal.show')) return;\n  var yearSelect = document.getElementById('ddl_yms_year');\n  var semSelect = document.getElementById('ddl_yms_smester');\n  if (yearSelect && semSelect) {\n    if (yearSelect.value !== '{{TARGET_YEAR}}' || semSelect.value !== '{{TARGET_SEM}}') return;\n  }\n  var titleSpan = document.querySelector('.card-header.bg-primary span.fw-bold');\n  if (titleSpan) {\n    var titleText = titleSpan.innerText;\n    if (titleText.indexOf('{{TARGET_YEAR}}') === -1 || titleText.indexOf('第 {{TARGET_SEM}}') === -1) return;\n  }\n  var table = document.querySelector('table.table-timetable');\n  if (!table) return;\n  window._hasSentData = true;\n  try {\n    var result = [];\n    var slotMap = ['1','2','3','4','14','5','6','7','8','9','10','11','12','13'];\n    for (var k = 0; k < slotMap.length; k++) {\n      result.push({ slot: slotMap[k], days: [{},{},{},{},{},{},{}] });\n    }\n    var rows = table.querySelectorAll('tbody tr');\n    var dataIndex = 0;\n    for (var i = 0; i < rows.length; i++) {\n      var tr = rows[i];\n      var cols = tr.querySelectorAll('td.course-cell');\n      if (cols.length >= 7 && dataIndex < result.length) {\n        var currentSlot = result[dataIndex];\n        for (var d = 0; d < 7; d++) {\n          var cell = cols[d];\n          var div = cell.querySelector('.course-text');\n          var text = div ? div.innerText.trim() : cell.innerText.trim();\n          if (text.length > 0) {\n            var parts = text.split('/');\n            var courseObj = {};\n            if (parts.length >= 3) {\n              courseObj = {\n                id: parts[0].trim(),\n                name: parts[1] ? parts[1].trim().replace(/^[A-Z]/, '') : '',\n                room: (parts[3] && parts[3].includes('教室')) ? parts[3].replace('教室','').trim() : (parts[3] || '').trim(),\n                teacher: parts[4] ? parts[4].trim() : ''\n              };\n            } else {\n              courseObj = { name: text, room: '', teacher: '' };\n            }\n            currentSlot.days[d] = courseObj;\n          }\n        }\n        dataIndex++;\n      }\n    }\n    if (window.mobileApp) {\n      window.mobileApp.postMessage({ detail: { type: 'DATA_SUCCESS', payload: result }});\n    } else {\n      window.location.href = 'school-data://' + encodeURIComponent(JSON.stringify({ type: 'DATA_SUCCESS', payload: result }));\n    }\n  } catch (e) {\n    if (window.mobileApp) {\n      window.mobileApp.postMessage({ detail: { type: 'ERROR', message: '解析失敗: ' + e.message }});\n    }\n  }\n})();",
-        "manualParseScript": ""
-    },
-    "news": {
-        "enabled": true,
-        "mode": "api",
-        "apiUrl": "https://aps.ncue.edu.tw/odedi/ajax/doc_board_ajax.php",
-        "apiMethod": "POST",
-        "apiHeaders": "{\"Content-Type\": \"application/x-www-form-urlencoded\"}",
-        "apiBody": "doc_source=1&doc_type=0&start_date={{P3D}}&end_date={{TODAY}}&kind=1&tables_1_length=50&oper=qry_0",
-        "apiRequestScript": "function formatDate(date) {\n  var y = date.getFullYear();\n  var m = String(date.getMonth() + 1).padStart(2, '0');\n  var d = String(date.getDate()).padStart(2, '0');\n  return y + '/' + m + '/' + d;\n}\nvar today = new Date();\nvar threeDaysAgo = new Date();\nthreeDaysAgo.setDate(today.getDate() - 3);\n\nreturn {\n  TODAY: formatDate(today),\n  P3D: formatDate(threeDaysAgo)\n};",
-        "parseScript": "var parsedList = [];\nif (responseData && responseData.data) {\n  responseData.data.forEach(function(item) {\n    if (Array.isArray(item) && item.length > 7) {\n      var cleanTitle = (item[0] || '').replace(/<[^>]+>/g, \"\").trim().replace(/&amp;/g, \"&\");\n      parsedList.push({\n        title: cleanTitle,\n        department: item[1],\n        date: item[3].trim(),\n        link: 'https://aps.ncue.edu.tw/odedi/doc_page.php?id=' + item[7]\n      });\n    }\n  });\n  parsedList.sort(function(a, b) { return b.date.localeCompare(a.date); });\n}\nreturn parsedList;",
-        "webviewUrl": "",
-        "targetUrlIndicators": [],
-        "webviewScript": ""
-    },
-    "mail": {
-        "enabled": true,
-        "mode": "webview",
-        "apiUrl": "",
-        "apiMethod": "GET",
-        "apiHeaders": "{}",
-        "apiBody": "",
-        "apiRequestScript": "",
-        "parseScript": "return [];",
-        "webviewUrl": "https://aps.ncue.edu.tw/letter/letter.php",
-        "targetUrlIndicators": [
-            {
-                "type": "contains",
-                "value": "letter.php"
-            }
-        ],
-        "webviewScript": "(function() {\n  if (window._hasParsedMail) return;\n  var rows = document.querySelectorAll('table tr');\n  if (rows.length === 0) return;\n  \n  window._hasParsedMail = true;\n  var result = [];\n  \n  for (var i = 0; i < rows.length; i++) {\n    var cols = rows[i].querySelectorAll('td');\n    if (cols.length >= 4) {\n      var dept = cols[0].innerText.trim();\n      var name = cols[1].innerText.trim();\n      var date = cols[2].innerText.trim();\n      var campus = cols[3].innerText.trim();\n      \n      if (name.length > 0 && name !== '姓名') {\n        result.push({\n          department: dept,\n          name: name,\n          date: date,\n          campus: campus\n        });\n      }\n    }\n  }\n  \n  if (window.mobileApp) {\n    window.mobileApp.postMessage({ detail: { type: 'MAIL_SUCCESS', payload: result }});\n  }\n})();"
-    },
-    "links": [
-        {
-            "title": "常用入口與雲端服務",
-            "style": "pill",
-            "items": [
-                {
-                    "title": "校園資訊服務入口",
-                    "url": "https://nam.ncue.edu.tw/nidp/idff/sso?id=Form&sid=0&option=credential&sid=0&target=https://portal.ncue.edu.tw/portal/index.php"
-                },
-                {
-                    "title": "教務系統",
-                    "url": "https://webap2s.ncue.edu.tw/curri/stuEntry.html"
-                },
-                {
-                    "title": "新雲端學院",
-                    "url": "https://tronclass.ncue.edu.tw/"
-                },
-                {
-                    "title": "學生信箱",
-                    "url": "https://www.ncue.edu.tw/p/404-1000-28748.php?Lang=zh-tw"
-                },
-                {
-                    "title": "Office 365",
-                    "url": "https://www.ncue.edu.tw/p/404-1000-23509.php?Lang=zh-tw"
-                },
-                {
-                    "title": "Google 服務申請",
-                    "url": "https://forms.gle/53HWM5YgrrLJvtf7A"
-                },
-                {
-                    "title": "台灣銀行-學雜費",
-                    "url": "https://school.bot.com.tw/newTwbank/StudentLogin.aspx?id=Student"
-                }
-            ]
-        },
-        {
-            "title": "課程與學習",
-            "style": "list",
-            "items": [
-                {
-                    "title": "開課查詢",
-                    "url": "https://webapss.ncue.edu.tw/DEANV2/Other/OB010"
-                },
-                {
-                    "title": "教育實習管理系統",
-                    "url": "https://aps.ncue.edu.tw/practice/"
-                },
-                {
-                    "title": "學生超修管理系統",
-                    "url": "https://aps.ncue.edu.tw/over_credit/"
-                },
-                {
-                    "title": "學位考試申請系統",
-                    "url": "https://webap1s.ncue.edu.tw/DegreeExam_WF/CheckView?ref=1"
-                },
-                {
-                    "title": "學習歷程生涯服務系統",
-                    "url": "https://folio.ncue.edu.tw/df/"
-                },
-                {
-                    "title": "學生畢業門檻",
-                    "url": "https://apss.ncue.edu.tw/threshold/"
-                },
-                {
-                    "title": "交換生選課平台",
-                    "url": "https://webap1s.ncue.edu.tw/exchangestudent"
-                }
-            ]
-        },
-        {
-            "title": "校園生活",
-            "style": "list",
-            "items": [
-                {
-                    "title": "學生線上請假系統",
-                    "url": "https://aps.ncue.edu.tw/student/"
-                },
-                {
-                    "title": "線上報名管理系統",
-                    "url": "https://aps.ncue.edu.tw/sign_up/"
-                },
-                {
-                    "title": "學生宿舍申請系統",
-                    "url": "https://webap1.ncue.edu.tw/Dorm/"
-                },
-                {
-                    "title": "停車證線上申請管理系統",
-                    "url": "https://webap1s.ncue.edu.tw/OGS_PARKING/index.aspx"
-                },
-                {
-                    "title": "線上修繕系統",
-                    "url": "https://aps.ncue.edu.tw/repair/index.php"
-                },
-                {
-                    "title": "未領掛號信件名單",
-                    "url": "https://aps.ncue.edu.tw/letter/letter.php"
-                },
-                {
-                    "title": "學務資訊/社團E化",
-                    "url": "https://apss.ncue.edu.tw/studia_new/login.php"
-                },
-                {
-                    "title": "學生兼任助理法規專區",
-                    "url": "https://www.ncue.edu.tw/p/404-1000-2328.php"
-                },
-                {
-                    "title": "學生兵役線上申請系統",
-                    "url": "https://aps.ncue.edu.tw/guid/army/index.php"
-                },
-                {
-                    "title": "學生證掛失/退費系統",
-                    "url": "https://icard.ncue.edu.tw/NCUECMS/SSOLogin.aspx"
-                },
-                {
-                    "title": "校園助理人員管理系統",
-                    "url": "https://assistants.ncue.edu.tw/"
-                },
-                {
-                    "title": "學生離校系統",
-                    "url": "https://apss.ncue.edu.tw/sls/index.php"
-                },
-                {
-                    "title": "校友資訊管理系統",
-                    "url": "https://aps.ncue.edu.tw/student/graduate/login.php"
-                },
-                {
-                    "title": "學生會",
-                    "url": "https://ncuesa.ncue.edu.tw/"
-                }
-            ]
-        },
-        {
-            "title": "獎助學金及學雜費",
-            "style": "list",
-            "items": [
-                {
-                    "title": "學生就學貸款系統",
-                    "url": "https://apss.ncue.edu.tw/guid/index.php"
-                },
-                {
-                    "title": "弱勢學生助學金申請",
-                    "url": "https://aps.ncue.edu.tw/guid/weak/index.php"
-                },
-                {
-                    "title": "學雜費減免申請",
-                    "url": "https://aps.ncue.edu.tw/guid/minus/index.php"
-                },
-                {
-                    "title": "學生工讀金助學金申請",
-                    "url": "https://aps.ncue.edu.tw/working/"
-                },
-                {
-                    "title": "校內外獎助學金",
-                    "url": "https://www.ncue.edu.tw/p/412-1000-1513.php?Lang=zh-tw"
-                }
-            ]
-        },
-        {
-            "title": "場地借用",
-            "style": "list",
-            "items": [
-                {
-                    "title": "會議場所借用系統",
-                    "url": "https://apss.ncue.edu.tw/afair/index.php"
-                },
-                {
-                    "title": "運動場地借用系統",
-                    "url": "https://aps.ncue.edu.tw/court"
-                },
-                {
-                    "title": "電腦教室借用申請",
-                    "url": "https://olis.ncue.edu.tw/ct.asp?xItem=7811&CtNode=1233&mp=1"
-                }
-            ]
-        },
-        {
-            "title": "圖書與資訊服務",
-            "style": "list",
-            "items": [
-                {
-                    "title": "館藏查詢 WebpacX",
-                    "url": "https://webpacx.ncue.edu.tw/"
-                },
-                {
-                    "title": "電子資源探索平台 jumper+",
-                    "url": "https://jumper.ncue.edu.tw/"
-                },
-                {
-                    "title": "授權軟體線上下載系統",
-                    "url": "https://apss.ncue.edu.tw/filesdl"
-                },
-                {
-                    "title": "數位資源共享平台 (Citrix)",
-                    "url": "https://olis.ncue.edu.tw/ct.asp?xItem=8906&CtNode=1196&mp=1"
-                },
-                {
-                    "title": "校園虛擬加密網路 (SSL VPN)",
-                    "url": "https://olis.ncue.edu.tw/ct.asp?xItem=7868&CtNode=1195&mp=1"
-                },
-                {
-                    "title": "電腦教室開放狀況",
-                    "url": "https://aps.ncue.edu.tw/clsrm/ccapp/"
-                },
-                {
-                    "title": "彰化師大無線網路",
-                    "url": "https://olis.ncue.edu.tw/ct.asp?xItem=7658&ctNode=1133&mp=1"
-                },
-                {
-                    "title": "宿舍網路IP停用表",
-                    "url": "https://olis.ncue.edu.tw/ct.asp?xItem=7664&ctNode=1133&mp=1"
-                },
-                {
-                    "title": "資訊能力檢定網",
-                    "url": "https://sites.google.com/gm.ncue.edu.tw/tqc2022/"
-                },
-                {
-                    "title": "畢業離校系統",
-                    "url": "https://olis.ncue.edu.tw/lp.asp?CtNode=1200&CtUnit=398&BaseDSD=7&mp=1"
-                }
-            ]
-        }
-    ]
+	"schoolId": "ncue.edu.tw",
+	"schoolName": "彰化師範大學",
+	"logoPath": "https://www.ncue.edu.tw/var/file/0/1000/img/85/416208730.jpg",
+	"calendar": {
+		"type": "pdf",
+		"url": "https://aps.ncue.edu.tw/odedi/attch/M20/14/1406230041.pdf"
+	},
+	"auth": {
+		"entryUrl": "https://nam.ncue.edu.tw/nidp/idff/sso?id=Form&sid=0&option=credential&sid=0&target=https://portal.ncue.edu.tw/portal/home.php",
+		"successIndicators": [
+			{
+				"type": "exact",
+				"value": "https://portal.ncue.edu.tw"
+			},
+			{
+				"type": "exact",
+				"value": "http://portal.ncue.edu.tw"
+			},
+			{
+				"type": "startsWith",
+				"value": "https://webapss.ncue.edu.tw/Student"
+			},
+			{
+				"type": "startsWith",
+				"value": "https://webap2s.ncue.edu.tw/Student"
+			},
+			{
+				"type": "startsWith",
+				"value": "https://webap3s.ncue.edu.tw/Student"
+			}
+		],
+		"loginIndicators": [
+			{
+				"type": "startsWith",
+				"value": "https://nam.ncue.edu.tw"
+			}
+		],
+		"usernameSelector": "#Ecom_User_ID",
+		"passwordSelector": "#Ecom_Password",
+		"submitSelector": "button[name=\"LoginButton\"]",
+		"autoFill": true,
+		"autoSubmit": true,
+		"verifyScript": ""
+	},
+	"schedule": {
+		"syncMode": "auto",
+		"entryUrl": "https://webap2s.ncue.edu.tw/Student/baseuser/LoginSSO",
+		"targetUrlIndicators": [
+			{
+				"type": "contains",
+				"value": "SB020"
+			}
+		],
+		"sessionExpiredIndicators": [
+			{
+				"type": "contains",
+				"value": "nam.ncue.edu.tw"
+			},
+			{
+				"type": "contains",
+				"value": "nidp/idff/sso"
+			}
+		],
+		"timeSlots": [
+			{
+				"s": "1",
+				"t": "08:10~09:00"
+			},
+			{
+				"s": "2",
+				"t": "09:05~09:55"
+			},
+			{
+				"s": "3",
+				"t": "10:15~11:05"
+			},
+			{
+				"s": "4",
+				"t": "11:10~12:00"
+			},
+			{
+				"s": "14",
+				"t": "12:05~12:55"
+			},
+			{
+				"s": "5",
+				"t": "13:10~14:00"
+			},
+			{
+				"s": "6",
+				"t": "14:05~14:55"
+			},
+			{
+				"s": "7",
+				"t": "15:15~16:05"
+			},
+			{
+				"s": "8",
+				"t": "16:10~17:00"
+			},
+			{
+				"s": "9",
+				"t": "17:10~18:00"
+			},
+			{
+				"s": "10",
+				"t": "18:20~19:10"
+			},
+			{
+				"s": "11",
+				"t": "19:15~20:05"
+			},
+			{
+				"s": "12",
+				"t": "20:10~21:00"
+			},
+			{
+				"s": "13",
+				"t": "21:05~21:55"
+			}
+		],
+		"switchScript": "(function() {\n  if (window.isProcessing) return;\n  var yearSelect = document.getElementById('ddl_yms_year');\n  var semSelect = document.getElementById('ddl_yms_smester');\n  var btn = document.querySelector('button[name=\"PGcmd\"][value=\"查詢\"]');\n  if (yearSelect && semSelect && btn) {\n    var currentY = yearSelect.value;\n    var currentS = semSelect.value;\n    if (currentY !== '{{TARGET_YEAR}}' || currentS !== '{{TARGET_SEM}}') {\n      window.isProcessing = true;\n      yearSelect.value = '{{TARGET_YEAR}}';\n      semSelect.value = '{{TARGET_SEM}}';\n      btn.click();\n    }\n  }\n})();",
+		"parseScript": "(function() {\n  if (window.isProcessing) return;\n  var table = document.querySelector('table.table-timetable');\n  if (!table) return;\n  window.isProcessing = true;\n  var result = [];\n  var slotMap = ['1','2','3','4','14','5','6','7','8','9','10','11','12','13'];\n  for (var k = 0; k < slotMap.length; k++) {\n    result.push({ slot: slotMap[k], days: [{},{},{},{},{},{},{}] });\n  }\n  var rows = table.querySelectorAll('tbody tr');\n  var dataIndex = 0;\n  for (var i = 0; i < rows.length; i++) {\n    var tr = rows[i];\n    var cols = tr.querySelectorAll('td.course-cell');\n    if (cols.length >= 7 && dataIndex < result.length) {\n      var currentSlot = result[dataIndex];\n      for (var d = 0; d < 7; d++) {\n        var cell = cols[d];\n        var div = cell.querySelector('.course-text');\n        var text = div ? div.innerText.trim() : cell.innerText.trim();\n        if (text.length > 0) {\n          var parts = text.split('/');\n          var courseObj = {};\n          if (parts.length >= 3) {\n            courseObj = {\n              id: parts[0].trim(),\n              name: parts[1].trim().replace(/^[A-Z]/, ''),\n              room: (parts[3] && parts[3].includes('教室')) ? parts[3].replace('教室','').trim() : (parts[3] || '').trim(),\n              teacher: parts[4] ? parts[4].trim() : ''\n            };\n          } else {\n            courseObj = { name: text, room: '', teacher: '' };\n          }\n          currentSlot.days[d] = courseObj;\n        }\n      }\n      dataIndex++;\n    }\n  }\n  if (window.mobileApp) {\n    window.mobileApp.postMessage({ detail: { type: 'DATA_SUCCESS', payload: result }});\n  }\n})();",
+		"manualParseScript": ""
+	},
+	"news": {
+		"enabled": true,
+		"mode": "api",
+		"apiUrl": "https://aps.ncue.edu.tw/odedi/ajax/doc_board_ajax.php",
+		"apiMethod": "POST",
+		"apiHeaders": "{\"Content-Type\": \"application/x-www-form-urlencoded\"}",
+		"apiBody": "doc_source=1&doc_type=0&start_date={{P3D}}&end_date={{TODAY}}&kind=1&tables_1_length=50&oper=qry_0",
+		"apiRequestScript": "function formatDate(date) {\n  var y = date.getFullYear();\n  var m = String(date.getMonth() + 1).padStart(2, '0');\n  var d = String(date.getDate()).padStart(2, '0');\n  return y + '/' + m + '/' + d;\n}\nvar today = new Date();\nvar threeDaysAgo = new Date();\nthreeDaysAgo.setDate(today.getDate() - 3);\n\nreturn {\n  TODAY: formatDate(today),\n  P3D: formatDate(threeDaysAgo)\n};",
+		"parseScript": "var parsedList = [];\nif (responseData && responseData.data) {\n  responseData.data.forEach(function(item) {\n    if (Array.isArray(item) && item.length > 7) {\n      var cleanTitle = (item[0] || '').replace(/<[^>]+>/g, \"\").trim().replace(/&amp;/g, \"&\");\n      parsedList.push({\n        title: cleanTitle,\n        department: item[1],\n        date: item[3].trim(),\n        link: 'https://aps.ncue.edu.tw/odedi/doc_page.php?id=' + item[7]\n      });\n    }\n  });\n  parsedList.sort(function(a, b) { return b.date.localeCompare(a.date); });\n}\nreturn parsedList;",
+		"webviewUrl": "",
+		"targetUrlIndicators": [],
+		"webviewScript": ""
+	},
+	"mail": {
+		"enabled": true,
+		"mode": "webview",
+		"apiUrl": "",
+		"apiMethod": "GET",
+		"apiHeaders": "{}",
+		"apiBody": "",
+		"apiRequestScript": "",
+		"parseScript": "return [];",
+		"webviewUrl": "https://aps.ncue.edu.tw/letter/letter.php",
+		"targetUrlIndicators": [
+			{
+				"type": "contains",
+				"value": "letter.php"
+			}
+		],
+		"webviewScript": "(function() {\n  if (window._hasParsedMail) return;\n  var rows = document.querySelectorAll('table tr');\n  if (rows.length === 0) return;\n  \n  window._hasParsedMail = true;\n  var result = [];\n  \n  for (var i = 0; i < rows.length; i++) {\n    var cols = rows[i].querySelectorAll('td');\n    if (cols.length >= 4) {\n      var dept = cols[0].innerText.trim();\n      var name = cols[1].innerText.trim();\n      var date = cols[2].innerText.trim();\n      var campus = cols[3].innerText.trim();\n      \n      if (name.length > 0 && name !== '姓名') {\n        result.push({\n          department: dept,\n          name: name,\n          date: date,\n          campus: campus\n        });\n      }\n    }\n  }\n  \n  if (window.mobileApp) {\n    window.mobileApp.postMessage({ detail: { type: 'MAIL_SUCCESS', payload: result }});\n  }\n})();"
+	},
+	"links": [
+		{
+			"title": "常用入口與雲端服務",
+			"style": "pill",
+			"items": [
+				{
+					"title": "校園資訊服務入口",
+					"url": "https://nam.ncue.edu.tw/nidp/idff/sso?id=Form&sid=0&option=credential&sid=0&target=https://portal.ncue.edu.tw/portal/index.php"
+				},
+				{
+					"title": "教務系統",
+					"url": "https://webap2s.ncue.edu.tw/curri/stuEntry.html"
+				},
+				{
+					"title": "新雲端學院",
+					"url": "https://tronclass.ncue.edu.tw/"
+				},
+				{
+					"title": "學生信箱",
+					"url": "https://www.ncue.edu.tw/p/404-1000-28748.php?Lang=zh-tw"
+				},
+				{
+					"title": "Office 365",
+					"url": "https://www.ncue.edu.tw/p/404-1000-23509.php?Lang=zh-tw"
+				},
+				{
+					"title": "Google 服務申請",
+					"url": "https://forms.gle/53HWM5YgrrLJvtf7A"
+				},
+				{
+					"title": "台灣銀行-學雜費",
+					"url": "https://school.bot.com.tw/newTwbank/StudentLogin.aspx?id=Student"
+				}
+			]
+		},
+		{
+			"title": "課程與學習",
+			"style": "pill",
+			"items": [
+				{
+					"title": "開課查詢",
+					"url": "https://webapss.ncue.edu.tw/DEANV2/Other/OB010"
+				},
+				{
+					"title": "教育實習管理系統",
+					"url": "https://aps.ncue.edu.tw/practice/"
+				},
+				{
+					"title": "學生超修管理系統",
+					"url": "https://aps.ncue.edu.tw/over_credit/"
+				},
+				{
+					"title": "學位考試申請系統",
+					"url": "https://webap1s.ncue.edu.tw/DegreeExam_WF/CheckView?ref=1"
+				},
+				{
+					"title": "學習歷程生涯服務系統",
+					"url": "https://folio.ncue.edu.tw/df/"
+				},
+				{
+					"title": "學生畢業門檻",
+					"url": "https://apss.ncue.edu.tw/threshold/"
+				},
+				{
+					"title": "交換生選課平台",
+					"url": "https://webap1s.ncue.edu.tw/exchangestudent"
+				}
+			]
+		},
+		{
+			"title": "校園生活",
+			"style": "pill",
+			"items": [
+				{
+					"title": "學生線上請假系統",
+					"url": "https://aps.ncue.edu.tw/student/"
+				},
+				{
+					"title": "線上報名管理系統",
+					"url": "https://aps.ncue.edu.tw/sign_up/"
+				},
+				{
+					"title": "學生宿舍申請系統",
+					"url": "https://webap1.ncue.edu.tw/Dorm/"
+				},
+				{
+					"title": "停車證線上申請管理系統",
+					"url": "https://webap1s.ncue.edu.tw/OGS_PARKING/index.aspx"
+				},
+				{
+					"title": "線上修繕系統",
+					"url": "https://aps.ncue.edu.tw/repair/index.php"
+				},
+				{
+					"title": "未領掛號信件名單",
+					"url": "https://aps.ncue.edu.tw/letter/letter.php"
+				},
+				{
+					"title": "學務資訊/社團E化",
+					"url": "https://apss.ncue.edu.tw/studia_new/login.php"
+				},
+				{
+					"title": "學生兼任助理法規專區",
+					"url": "https://www.ncue.edu.tw/p/404-1000-2328.php"
+				},
+				{
+					"title": "學生兵役線上申請系統",
+					"url": "https://aps.ncue.edu.tw/guid/army/index.php"
+				},
+				{
+					"title": "學生證掛失/退費系統",
+					"url": "https://icard.ncue.edu.tw/NCUECMS/SSOLogin.aspx"
+				},
+				{
+					"title": "校園助理人員管理系統",
+					"url": "https://assistants.ncue.edu.tw/"
+				},
+				{
+					"title": "學生離校系統",
+					"url": "https://apss.ncue.edu.tw/sls/index.php"
+				},
+				{
+					"title": "校友資訊管理系統",
+					"url": "https://aps.ncue.edu.tw/student/graduate/login.php"
+				},
+				{
+					"title": "學生會",
+					"url": "https://ncuesa.ncue.edu.tw/"
+				}
+			]
+		},
+		{
+			"title": "獎助學金及學雜費",
+			"style": "pill",
+			"items": [
+				{
+					"title": "學生就學貸款系統",
+					"url": "https://apss.ncue.edu.tw/guid/index.php"
+				},
+				{
+					"title": "弱勢學生助學金申請",
+					"url": "https://aps.ncue.edu.tw/guid/weak/index.php"
+				},
+				{
+					"title": "學雜費減免申請",
+					"url": "https://aps.ncue.edu.tw/guid/minus/index.php"
+				},
+				{
+					"title": "學生工讀金助學金申請",
+					"url": "https://aps.ncue.edu.tw/working/"
+				},
+				{
+					"title": "校內外獎助學金",
+					"url": "https://www.ncue.edu.tw/p/412-1000-1513.php?Lang=zh-tw"
+				}
+			]
+		},
+		{
+			"title": "場地借用",
+			"style": "pill",
+			"items": [
+				{
+					"title": "會議場所借用系統",
+					"url": "https://apss.ncue.edu.tw/afair/index.php"
+				},
+				{
+					"title": "運動場地借用系統",
+					"url": "https://aps.ncue.edu.tw/court"
+				},
+				{
+					"title": "電腦教室借用申請",
+					"url": "https://olis.ncue.edu.tw/ct.asp?xItem=7811&CtNode=1233&mp=1"
+				}
+			]
+		},
+		{
+			"title": "圖書與資訊服務",
+			"style": "list",
+			"items": [
+				{
+					"title": "館藏查詢 WebpacX",
+					"url": "https://webpacx.ncue.edu.tw/"
+				},
+				{
+					"title": "電子資源探索平台 jumper+",
+					"url": "https://jumper.ncue.edu.tw/"
+				},
+				{
+					"title": "授權軟體線上下載系統",
+					"url": "https://apss.ncue.edu.tw/filesdl"
+				},
+				{
+					"title": "數位資源共享平台 (Citrix)",
+					"url": "https://olis.ncue.edu.tw/ct.asp?xItem=8906&CtNode=1196&mp=1"
+				},
+				{
+					"title": "校園虛擬加密網路 (SSL VPN)",
+					"url": "https://olis.ncue.edu.tw/ct.asp?xItem=7868&CtNode=1195&mp=1"
+				},
+				{
+					"title": "電腦教室開放狀況",
+					"url": "https://aps.ncue.edu.tw/clsrm/ccapp/"
+				},
+				{
+					"title": "彰化師大無線網路",
+					"url": "https://olis.ncue.edu.tw/ct.asp?xItem=7658&ctNode=1133&mp=1"
+				},
+				{
+					"title": "宿舍網路IP停用表",
+					"url": "https://olis.ncue.edu.tw/ct.asp?xItem=7664&ctNode=1133&mp=1"
+				},
+				{
+					"title": "資訊能力檢定網",
+					"url": "https://sites.google.com/gm.ncue.edu.tw/tqc2022/"
+				},
+				{
+					"title": "畢業離校系統",
+					"url": "https://olis.ncue.edu.tw/lp.asp?CtNode=1200&CtUnit=398&BaseDSD=7&mp=1"
+				}
+			]
+		}
+	]
 }
