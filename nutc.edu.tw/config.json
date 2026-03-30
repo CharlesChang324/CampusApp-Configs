@@ -63,7 +63,7 @@
 		"webviewScript": "(function () {\n  // 全域鎖：防止重複執行回傳\n  if (window._hasParsedNews) return;\n\n  var rows = document.querySelectorAll('.listTB tbody tr');\n  if (rows.length === 0) return; // 等待表格載入完成\n\n  window._hasParsedNews = true;\n  var result = [];\n\n  for (var i = 0; i < rows.length; i++) {\n    var tr = rows[i];\n    var titleA = tr.querySelector('td[data-th=\"標題\"] a');\n    var dateTd = tr.querySelector('td[data-th=\"日期\"]');\n    var deptTd = tr.querySelector('td[data-th=\"發佈單位\"]');\n\n    if (titleA) {\n      var cleanDate = dateTd ? dateTd.textContent.replace(/[\\s\\[\\]]/g, '') : '';\n\n      result.push({\n        title: titleA.textContent.trim(),\n        date: cleanDate,\n        link: titleA.href,\n        department: deptTd ? deptTd.textContent.trim() : '校方公告'\n      });\n    }\n  }\n\n  if (window.mobileApp) {\n    window.mobileApp.postMessage({\n      detail: {\n        type: 'NEWS_SUCCESS',\n        payload: result\n      }\n    });\n  }\n})();"
 	},
 	"mail": {
-		"enabled": false,
+		"enabled": true,
 		"mode": "webview",
 		"apiUrl": "",
 		"apiMethod": "GET",
@@ -71,9 +71,11 @@
 		"apiBody": "",
 		"apiRequestScript": "",
 		"parseScript": "return [];",
-		"webviewUrl": "https://aps.ncue.edu.tw/letter/letter.php",
-		"targetUrlIndicators": [{ "type": "contains", "value": "letter.php" }],
-		"webviewScript": ""
+		"webviewUrl": "https://webmail.nutc.edu.tw/cgi-bin/start?umode=0",
+		"targetUrlIndicators": [
+			{ "type": "contains", "value": "webmail.nutc.edu.tw" }
+		],
+		"webviewScript": "(function () {\n  if (window._hasParsedMail) return;\n\n  var etable = document.getElementById('lvMsgList_etable');\n  if (!etable) return;\n\n  var rows = etable.querySelectorAll('tr[lvrecidx]');\n  if (rows.length === 0) return;\n\n  window._hasParsedMail = true;\n  var result = [];\n\n  for (var i = 0; i < rows.length; i++) {\n    var tr = rows[i];\n\n    var subjectEl = tr.querySelector('.ML_Subject');\n    var subject = subjectEl ? subjectEl.textContent.trim() : '';\n\n    var senderTd = tr.querySelector('td[lvcolidx=\"5\"]');\n    var senderName = senderTd ? senderTd.querySelector('nobr').textContent.trim() : '';\n    var senderEmail = senderTd ? (senderTd.getAttribute('title') || '') : '';\n    var sender = senderEmail ? (senderName + ' <' + senderEmail + '>') : senderName;\n\n    var dateTd = tr.querySelector('td[lvcolidx=\"6\"]');\n    var date = dateTd ? dateTd.querySelector('nobr').textContent.trim() : '';\n\n    var statusImg = tr.querySelector('td[lvcolidx=\"4\"] img');\n    var isRead = statusImg ? statusImg.getAttribute('title').indexOf('未讀') === -1 : true;\n\n    if (subject) {\n      result.push({\n        name: sender,\n        department: isRead ? '已讀' : '未讀',\n        date: date,\n        campus: subject\n      });\n    }\n  }\n\n  if (window.mobileApp) {\n    window.mobileApp.postMessage({\n      detail: {\n        type: 'MAIL_SUCCESS',\n        payload: result\n      }\n    });\n  }\n})();"
 	},
 	"links": [
 		{
