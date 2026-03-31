@@ -9,32 +9,14 @@
 	"auth": {
 		"entryUrl": "https://nam.ncue.edu.tw/nidp/idff/sso?id=Form&sid=0&option=credential&sid=0&target=https://portal.ncue.edu.tw/portal/home.php",
 		"successIndicators": [
-			{
-				"type": "exact",
-				"value": "https://portal.ncue.edu.tw"
-			},
-			{
-				"type": "exact",
-				"value": "http://portal.ncue.edu.tw"
-			},
-			{
-				"type": "startsWith",
-				"value": "https://webapss.ncue.edu.tw/Student"
-			},
-			{
-				"type": "startsWith",
-				"value": "https://webap2s.ncue.edu.tw/Student"
-			},
-			{
-				"type": "startsWith",
-				"value": "https://webap3s.ncue.edu.tw/Student"
-			}
+			{ "type": "exact", "value": "https://portal.ncue.edu.tw" },
+			{ "type": "exact", "value": "http://portal.ncue.edu.tw" },
+			{ "type": "startsWith", "value": "https://webapss.ncue.edu.tw/Student" },
+			{ "type": "startsWith", "value": "https://webap2s.ncue.edu.tw/Student" },
+			{ "type": "startsWith", "value": "https://webap3s.ncue.edu.tw/Student" }
 		],
 		"loginIndicators": [
-			{
-				"type": "startsWith",
-				"value": "https://nam.ncue.edu.tw"
-			}
+			{ "type": "startsWith", "value": "https://nam.ncue.edu.tw" }
 		],
 		"usernameSelector": "#Ecom_User_ID",
 		"passwordSelector": "#Ecom_Password",
@@ -46,83 +28,47 @@
 	"schedule": {
 		"syncMode": "auto",
 		"entryUrl": "https://webap2s.ncue.edu.tw/Student/baseuser/LoginSSO",
-		"targetUrlIndicators": [
-			{
-				"type": "contains",
-				"value": "SB020"
-			}
-		],
+		"targetUrlIndicators": [{ "type": "contains", "value": "SB020" }],
 		"sessionExpiredIndicators": [
-			{
-				"type": "contains",
-				"value": "nam.ncue.edu.tw"
-			},
-			{
-				"type": "contains",
-				"value": "nidp/idff/sso"
-			}
+			{ "type": "contains", "value": "nam.ncue.edu.tw" },
+			{ "type": "contains", "value": "nidp/idff/sso" }
 		],
 		"timeSlots": [
-			{
-				"s": "1",
-				"t": "08:10~09:00"
-			},
-			{
-				"s": "2",
-				"t": "09:05~09:55"
-			},
-			{
-				"s": "3",
-				"t": "10:15~11:05"
-			},
-			{
-				"s": "4",
-				"t": "11:10~12:00"
-			},
-			{
-				"s": "14",
-				"t": "12:05~12:55"
-			},
-			{
-				"s": "5",
-				"t": "13:10~14:00"
-			},
-			{
-				"s": "6",
-				"t": "14:05~14:55"
-			},
-			{
-				"s": "7",
-				"t": "15:15~16:05"
-			},
-			{
-				"s": "8",
-				"t": "16:10~17:00"
-			},
-			{
-				"s": "9",
-				"t": "17:10~18:00"
-			},
-			{
-				"s": "10",
-				"t": "18:20~19:10"
-			},
-			{
-				"s": "11",
-				"t": "19:15~20:05"
-			},
-			{
-				"s": "12",
-				"t": "20:10~21:00"
-			},
-			{
-				"s": "13",
-				"t": "21:05~21:55"
-			}
+			{ "s": "1", "t": "08:10~09:00" },
+			{ "s": "2", "t": "09:05~09:55" },
+			{ "s": "3", "t": "10:15~11:05" },
+			{ "s": "4", "t": "11:10~12:00" },
+			{ "s": "14", "t": "12:05~12:55" },
+			{ "s": "5", "t": "13:10~14:00" },
+			{ "s": "6", "t": "14:05~14:55" },
+			{ "s": "7", "t": "15:15~16:05" },
+			{ "s": "8", "t": "16:10~17:00" },
+			{ "s": "9", "t": "17:10~18:00" },
+			{ "s": "10", "t": "18:20~19:10" },
+			{ "s": "11", "t": "19:15~20:05" },
+			{ "s": "12", "t": "20:10~21:00" },
+			{ "s": "13", "t": "21:05~21:55" }
 		],
 		"switchScript": "(function() {\n  if (window.isProcessing) return;\n  var yearSelect = document.getElementById('ddl_yms_year');\n  var semSelect = document.getElementById('ddl_yms_smester');\n  var btn = document.querySelector('button[name=\"PGcmd\"][value=\"查詢\"]');\n  if (yearSelect && semSelect && btn) {\n    var currentY = yearSelect.value;\n    var currentS = semSelect.value;\n    if (currentY !== '{{TARGET_YEAR}}' || currentS !== '{{TARGET_SEM}}') {\n      window.isProcessing = true;\n      yearSelect.value = '{{TARGET_YEAR}}';\n      semSelect.value = '{{TARGET_SEM}}';\n      btn.click();\n    }\n  }\n})();",
 		"parseScript": "(function() {\n  if (window.isProcessing) return;\n  var table = document.querySelector('table.table-timetable');\n  if (!table) return;\n  window.isProcessing = true;\n  var result = [];\n  var slotMap = ['1','2','3','4','14','5','6','7','8','9','10','11','12','13'];\n  for (var k = 0; k < slotMap.length; k++) {\n    result.push({ slot: slotMap[k], days: [{},{},{},{},{},{},{}] });\n  }\n  var rows = table.querySelectorAll('tbody tr');\n  var dataIndex = 0;\n  for (var i = 0; i < rows.length; i++) {\n    var tr = rows[i];\n    var cols = tr.querySelectorAll('td.course-cell');\n    if (cols.length >= 7 && dataIndex < result.length) {\n      var currentSlot = result[dataIndex];\n      for (var d = 0; d < 7; d++) {\n        var cell = cols[d];\n        var div = cell.querySelector('.course-text');\n        var text = div ? div.innerText.trim() : cell.innerText.trim();\n        if (text.length > 0) {\n          var parts = text.split('/');\n          var courseObj = {};\n          if (parts.length >= 3) {\n            courseObj = {\n              id: parts[0].trim(),\n              name: parts[1].trim().replace(/^[A-Z]/, ''),\n              room: (parts[3] && parts[3].includes('教室')) ? parts[3].replace('教室','').trim() : (parts[3] || '').trim(),\n              teacher: parts[4] ? parts[4].trim() : ''\n            };\n          } else {\n            courseObj = { name: text, room: '', teacher: '' };\n          }\n          currentSlot.days[d] = courseObj;\n        }\n      }\n      dataIndex++;\n    }\n  }\n  if (window.mobileApp) {\n    window.mobileApp.postMessage({ detail: { type: 'DATA_SUCCESS', payload: result }});\n  }\n})();",
 		"manualParseScript": ""
+	},
+	"score": {
+		"enabled": true,
+		"mode": "webview",
+		"fetchMode": "all",
+		"entryUrl": "https://webap2s.ncue.edu.tw/Student/baseuser/LoginSSO",
+		"targetUrlIndicators": [
+			{ "type": "contains", "value": "SD100" },
+			{ "type": "contains", "value": "SB020" },
+			{ "type": "contains", "value": "LoginSSO" }
+		],
+		"switchScript": "",
+		"parseScript": "(function () {\n    // 防重複送出鎖\n    if (window._hasParsedScore) return;\n\n\n    var url = location.href;\n\n\n    // 1. 如果在首頁或跳轉頁，尋找成績頁按鈕並點擊跳轉\n    if (url.indexOf(\"SB020\") !== -1 || url.indexOf(\"baseuser/LoginSSO\") !== -1) {\n        var targetLink = document.querySelector('a[href*=\"SD100/Index\"]');\n        if (targetLink) targetLink.click();\n        return; // 結束執行，等待網頁跳轉\n    }\n\n\n    // 2. 進入真實成績頁 (SD100) 的邏輯\n    if (url.indexOf(\"SD100\") !== -1) {\n        // 處理 Bootstrap 5 阻擋彈窗\n        var modal = document.getElementById(\"mySD100\");\n        if (\n            modal &&\n            (modal.classList.contains(\"show\") || modal.style.display === \"block\")\n        ) {\n            var confirmBtn = modal.querySelector('button[value=\"確認SD100\"]');\n            if (confirmBtn) {\n                confirmBtn.click();\n                return;\n            }\n            var closeBtn = modal.querySelector('button[data-bs-dismiss=\"modal\"]');\n            if (closeBtn) {\n                closeBtn.click();\n                return;\n            }\n        }\n\n\n        // 抓取成績表格\n        var tables = document.querySelectorAll(\"#MyDiv table\");\n        if (tables.length === 0) return; // 還沒載入出來\n\n\n        var results = [];\n\n\n        tables.forEach(function (table) {\n            var rows = table.querySelectorAll(\"tbody tr\");\n            rows.forEach(function (tr) {\n                if (tr.innerText.indexOf(\"無資料\") !== -1) return;\n\n\n                var tds = tr.querySelectorAll(\"td\");\n                if (tds.length >= 7) {\n                    var year = tds[0].innerText.trim();\n                    var sem = tds[1].innerText.trim();\n                    var className = tds[2].innerText.trim();\n                    var type = tds[3].innerText.trim();\n                    var subject = tds[4].innerText.trim();\n                    var credit = tds[5].innerText.trim();\n                    var scoreRaw = tds[6].innerText.trim();\n\n\n                    var scoreNum = parseInt(scoreRaw);\n                    var isPass = true;\n                    var statusText = \"及格\";\n\n\n                    if (\n                        tds[6].querySelector(\".text-danger\") ||\n                        (!isNaN(scoreNum) && scoreNum < 60)\n                    ) {\n                        isPass = false;\n                        statusText = \"不及格\";\n                    }\n\n\n                    if (isNaN(scoreNum)) {\n                        statusText = scoreRaw;\n                        isPass = scoreRaw.indexOf(\"成績未到\") !== -1 ? null : false;\n                    }\n\n\n                    var displayScore =\n                        scoreRaw.indexOf(\"成績未到\") !== -1 ? \"-\" : scoreRaw;\n\n\n                    results.push({\n                        term: year + \"-\" + sem,\n                        subject: subject,\n                        score: displayScore,\n                        credit: credit,\n                        type: type,\n                        className: className,\n                        isPass: isPass,\n                        status: statusText,\n                    });\n                }\n            });\n        });\n\n\n        // 統一使用 postMessage 發送結果\n        if (results.length > 0) {\n            window._hasParsedScore = true;\n            if (window.mobileApp) {\n                window.mobileApp.postMessage({\n                    detail: { type: \"DATA_SUCCESS\", payload: results },\n                });\n            }\n        }\n    }\n})();\n",
+		"sessionExpiredIndicators": [
+			{ "type": "contains", "value": "nam.ncue.edu.tw" },
+			{ "type": "contains", "value": "nidp/idff/sso" }
+		]
 	},
 	"news": {
 		"enabled": true,
@@ -147,12 +93,7 @@
 		"apiRequestScript": "",
 		"parseScript": "return [];",
 		"webviewUrl": "https://aps.ncue.edu.tw/letter/letter.php",
-		"targetUrlIndicators": [
-			{
-				"type": "contains",
-				"value": "letter.php"
-			}
-		],
+		"targetUrlIndicators": [{ "type": "contains", "value": "letter.php" }],
 		"webviewScript": "(function() {\n  if (window._hasParsedMail) return;\n  var rows = document.querySelectorAll('table tr');\n  if (rows.length === 0) return;\n  \n  window._hasParsedMail = true;\n  var result = [];\n  \n  for (var i = 0; i < rows.length; i++) {\n    var cols = rows[i].querySelectorAll('td');\n    if (cols.length >= 4) {\n      var dept = cols[0].innerText.trim();\n      var name = cols[1].innerText.trim();\n      var date = cols[2].innerText.trim();\n      var campus = cols[3].innerText.trim();\n      \n      if (name.length > 0 && name !== '姓名') {\n        result.push({\n          department: dept,\n          name: name,\n          date: date,\n          campus: campus\n        });\n      }\n    }\n  }\n  \n  if (window.mobileApp) {\n    window.mobileApp.postMessage({ detail: { type: 'MAIL_SUCCESS', payload: result }});\n  }\n})();"
 	},
 	"links": [
@@ -168,10 +109,7 @@
 					"title": "教務系統",
 					"url": "https://webap2s.ncue.edu.tw/curri/stuEntry.html"
 				},
-				{
-					"title": "新雲端學院",
-					"url": "https://tronclass.ncue.edu.tw/"
-				},
+				{ "title": "新雲端學院", "url": "https://tronclass.ncue.edu.tw/" },
 				{
 					"title": "學生信箱",
 					"url": "https://www.ncue.edu.tw/p/404-1000-28748.php?Lang=zh-tw"
@@ -280,10 +218,7 @@
 					"title": "校友資訊管理系統",
 					"url": "https://aps.ncue.edu.tw/student/graduate/login.php"
 				},
-				{
-					"title": "學生會",
-					"url": "https://ncuesa.ncue.edu.tw/"
-				}
+				{ "title": "學生會", "url": "https://ncuesa.ncue.edu.tw/" }
 			]
 		},
 		{
@@ -320,10 +255,7 @@
 					"title": "會議場所借用系統",
 					"url": "https://apss.ncue.edu.tw/afair/index.php"
 				},
-				{
-					"title": "運動場地借用系統",
-					"url": "https://aps.ncue.edu.tw/court"
-				},
+				{ "title": "運動場地借用系統", "url": "https://aps.ncue.edu.tw/court" },
 				{
 					"title": "電腦教室借用申請",
 					"url": "https://olis.ncue.edu.tw/ct.asp?xItem=7811&CtNode=1233&mp=1"
@@ -334,10 +266,7 @@
 			"title": "圖書與資訊服務",
 			"style": "list",
 			"items": [
-				{
-					"title": "館藏查詢 WebpacX",
-					"url": "https://webpacx.ncue.edu.tw/"
-				},
+				{ "title": "館藏查詢 WebpacX", "url": "https://webpacx.ncue.edu.tw/" },
 				{
 					"title": "電子資源探索平台 jumper+",
 					"url": "https://jumper.ncue.edu.tw/"

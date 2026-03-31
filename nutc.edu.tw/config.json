@@ -9,11 +9,20 @@
 	"auth": {
 		"entryUrl": "https://sso.nutc.edu.tw/eportal/",
 		"successIndicators": [
-			{ "type": "contains", "value": "ais.nutc.edu.tw/student/home.aspx" }
+			{
+				"type": "contains",
+				"value": "ais.nutc.edu.tw/student/home.aspx"
+			}
 		],
 		"loginIndicators": [
-			{ "type": "contains", "value": "sso.nutc.edu.tw/eportal" },
-			{ "type": "contains", "value": "Login" }
+			{
+				"type": "contains",
+				"value": "sso.nutc.edu.tw/eportal"
+			},
+			{
+				"type": "contains",
+				"value": "Login"
+			}
 		],
 		"usernameSelector": "#ContentPlaceHolder1_Account",
 		"passwordSelector": "#ContentPlaceHolder1_Password",
@@ -26,28 +35,98 @@
 		"syncMode": "auto",
 		"entryUrl": "https://ais.nutc.edu.tw/student/courses/my_week_time.aspx",
 		"targetUrlIndicators": [
-			{ "type": "contains", "value": "my_week_time.aspx" }
+			{
+				"type": "contains",
+				"value": "my_week_time.aspx"
+			}
 		],
-		"sessionExpiredIndicators": [{ "type": "contains", "value": "Login.aspx" }],
+		"sessionExpiredIndicators": [
+			{
+				"type": "contains",
+				"value": "Login.aspx"
+			}
+		],
 		"timeSlots": [
-			{ "s": "1", "t": "08:20~09:10" },
-			{ "s": "2", "t": "09:20~10:10" },
-			{ "s": "3", "t": "10:20~11:10" },
-			{ "s": "4", "t": "11:20~12:10" },
-			{ "s": "5", "t": "13:10~14:00" },
-			{ "s": "6", "t": "14:10~15:00" },
-			{ "s": "7", "t": "15:10~16:00" },
-			{ "s": "8", "t": "16:10~17:00" },
-			{ "s": "9", "t": "17:10~18:00" },
-			{ "s": "10", "t": "18:20~19:10" },
-			{ "s": "11", "t": "19:15~20:05" },
-			{ "s": "12", "t": "20:10~21:00" },
-			{ "s": "13", "t": "21:05~21:55" },
-			{ "s": "14", "t": "22:00~22:50" }
+			{
+				"s": "1",
+				"t": "08:20~09:10"
+			},
+			{
+				"s": "2",
+				"t": "09:20~10:10"
+			},
+			{
+				"s": "3",
+				"t": "10:20~11:10"
+			},
+			{
+				"s": "4",
+				"t": "11:20~12:10"
+			},
+			{
+				"s": "5",
+				"t": "13:10~14:00"
+			},
+			{
+				"s": "6",
+				"t": "14:10~15:00"
+			},
+			{
+				"s": "7",
+				"t": "15:10~16:00"
+			},
+			{
+				"s": "8",
+				"t": "16:10~17:00"
+			},
+			{
+				"s": "9",
+				"t": "17:10~18:00"
+			},
+			{
+				"s": "10",
+				"t": "18:20~19:10"
+			},
+			{
+				"s": "11",
+				"t": "19:15~20:05"
+			},
+			{
+				"s": "12",
+				"t": "20:10~21:00"
+			},
+			{
+				"s": "13",
+				"t": "21:05~21:55"
+			},
+			{
+				"s": "14",
+				"t": "22:00~22:50"
+			}
 		],
 		"switchScript": "(function(){\n  // 無需學期切換\n})();",
 		"parseScript": "(function() {\n  try {\n    if (window._hasSentData) return;\n    if (typeof g_ClsTime === 'undefined') return;\n\n    var result = [];\n    var slotMap = ['1','2','3','4','5','6','7','8','9','10','11','12','13','14'];\n    for(var k=0; k<slotMap.length; k++) {\n      result.push({ slot: slotMap[k], days: [{},{},{},{},{},{},{}] });\n    }\n\n    var hasData = false;\n    for (var key in g_ClsTime) {\n      var kParts = key.split('-');\n      var dayIdx = parseInt(kParts[0]) - 1;\n      var pIdx = parseInt(kParts[1]) - 1;\n      if(dayIdx >= 0 && dayIdx < 7 && pIdx >= 0 && pIdx < slotMap.length) {\n        var cData = g_ClsTime[key].split('\\t');\n        var cName = cData[1] ? cData[1].replace(/<[^>]+>/g, '').trim() : '';\n        result[pIdx].days[dayIdx] = {\n          name: cName,\n          teacher: cData[2] ? cData[2].trim() : '',\n          room: cData[3] ? cData[3].trim() : ''\n        };\n        hasData = true;\n      }\n    }\n    \n    if (hasData) {\n      window._hasSentData = true;\n      if(window.mobileApp) {\n        window.mobileApp.postMessage({ detail: { type: 'DATA_SUCCESS', payload: result }});\n      }\n    }\n  } catch(e) {}\n})();",
 		"manualParseScript": "(function() {\n  try {\n    if (typeof g_ClsTime === 'undefined') {\n        if(window.mobileApp) window.mobileApp.postMessage({ detail: { type: 'ERROR', message: '找不到課表變數資料，請確認網頁是否載入完成。' }});\n        return;\n    }\n\n    var result = [];\n    var slotMap = ['1','2','3','4','5','6','7','8','9','10','11','12','13','14'];\n    for(var k=0; k<slotMap.length; k++) {\n      result.push({ slot: slotMap[k], days: [{},{},{},{},{},{},{}] });\n    }\n\n    var hasData = false;\n    for (var key in g_ClsTime) {\n      var kParts = key.split('-');\n      var dayIdx = parseInt(kParts[0]) - 1;\n      var pIdx = parseInt(kParts[1]) - 1;\n      if(dayIdx >= 0 && dayIdx < 7 && pIdx >= 0 && pIdx < slotMap.length) {\n        var cData = g_ClsTime[key].split('\\t');\n        var cName = cData[1] ? cData[1].replace(/<[^>]+>/g, '').trim() : '';\n        result[pIdx].days[dayIdx] = {\n          name: cName,\n          teacher: cData[2] ? cData[2].trim() : '',\n          room: cData[3] ? cData[3].trim() : ''\n        };\n        hasData = true;\n      }\n    }\n    \n    if (hasData) {\n      if(window.mobileApp) window.mobileApp.postMessage({ detail: { type: 'DATA_SUCCESS', payload: result }});\n    } else {\n      if(window.mobileApp) window.mobileApp.postMessage({ detail: { type: 'ERROR', message: '解析成功，但課表無資料。' }});\n    }\n  } catch(e) {\n     if(window.mobileApp) window.mobileApp.postMessage({ detail: { type: 'ERROR', message: e.toString() }});\n  }\n})();"
+	},
+	"score": {
+		"enabled": true,
+		"mode": "webview",
+		"fetchMode": "all",
+		"entryUrl": "https://ais.nutc.edu.tw/student/stu/progress_view.aspx",
+		"targetUrlIndicators": [
+			{
+				"type": "contains",
+				"value": "progress_view.aspx"
+			}
+		],
+		"switchScript": "",
+		"parseScript": "(function () {\n    // 防重複送出鎖\n    if (window._hasParsedScore) return;\n\n\n    var rows = document.querySelectorAll(\"tr.tr_data\");\n    if (rows.length === 0) return;\n\n\n    var results = [];\n\n\n    rows.forEach(function (row) {\n        var tds = row.querySelectorAll(\"td\");\n        // 確保欄位數量正確 (至少要有 8 欄才包含上下學期成績)\n        if (tds.length < 8) return;\n\n\n        // 整理基本資訊\n        var yearLabel = tds[1].innerText.replace(/[\\n\\r\\s]+/g, \"\"); // 範例：一(年), 一(上), 一(下)\n        var subject = tds[2].innerText.trim();\n        var type = tds[3].innerText.replace(/[\\n\\r\\s]+/g, \"\"); // 範例：必, 選, 博雅\n        var credit = tds[4].innerText.trim();\n\n\n        // 定義處理單一學期的內部函式\n        function processSemester(td, semSuffix) {\n            var passStatus = td.getAttribute(\"data-pass_status\");\n            var scoreVal = td.getAttribute(\"data-score\") || \"\";\n\n\n            // 若為 '-' 代表該學期沒這堂課，或是資料為空，直接略過\n            if (!passStatus || passStatus === \"-\") return;\n\n\n            var isPass = null;\n            var statusText = \"未知\";\n\n\n            // 狀態映射邏輯 (處理 P, T, F, ?, N, W)\n            if (passStatus.indexOf(\"P\") !== -1 || passStatus.indexOf(\"T\") !== -1) {\n                isPass = true; // 綠色\n                statusText = passStatus.indexOf(\"T\") !== -1 ? \"抵免/免修\" : \"通過\";\n            } else if (\n                passStatus.indexOf(\"F\") !== -1 ||\n                passStatus.indexOf(\"W\") !== -1\n            ) {\n                isPass = false; // 紅色\n                statusText = passStatus.indexOf(\"W\") !== -1 ? \"專案退選\" : \"不及格\";\n            } else if (passStatus.indexOf(\"?\") !== -1) {\n                isPass = null; // 黃/灰色\n                statusText = \"修業中\";\n            } else if (passStatus.indexOf(\"N\") !== -1) {\n                isPass = null; // 黃/灰色\n                statusText = \"尚未修習\";\n            }\n\n\n            // 決定顯示的分數：如果有數字分數就顯示數字，沒有就顯示英文字母(P/T/F)\n            var displayScore = scoreVal !== \"\" ? scoreVal : passStatus;\n\n\n            // 組合學期名稱：如果原本只有寫「一(年)」，就要根據欄位補上「上」或「下」\n            var term = yearLabel;\n            // 如果文字不包含上或下，且我們正在處理上下學期的特定 td\n            if (yearLabel.indexOf(\"上\") === -1 && yearLabel.indexOf(\"下\") === -1) {\n                term = yearLabel.replace(\"年)\", \"\") + semSuffix + \")\";\n            }\n\n\n            results.push({\n                term: term,\n                subject: subject,\n                score: displayScore,\n                credit: credit,\n                type: type,\n                className: \"\", // 此表格無班級資訊\n                isPass: isPass,\n                status: statusText,\n            });\n        }\n\n\n        // 分別處理上學期 (tds[5]) 與 下學期 (tds[6])\n        processSemester(tds[5], \"上\");\n        processSemester(tds[6], \"下\");\n    });\n\n\n    // 統一使用 postMessage 發送結果\n    if (results.length > 0) {\n        window._hasParsedScore = true;\n        if (window.mobileApp) {\n            window.mobileApp.postMessage({\n                detail: { type: \"DATA_SUCCESS\", payload: results },\n            });\n        }\n    }\n})();\n",
+		"sessionExpiredIndicators": [
+			{
+				"type": "contains",
+				"value": "Login.aspx"
+			}
+		]
 	},
 	"news": {
 		"enabled": true,
@@ -72,7 +151,12 @@
 		"apiRequestScript": "",
 		"parseScript": "return [];",
 		"webviewUrl": "https://aps.ncue.edu.tw/letter/letter.php",
-		"targetUrlIndicators": [{ "type": "contains", "value": "letter.php" }],
+		"targetUrlIndicators": [
+			{
+				"type": "contains",
+				"value": "letter.php"
+			}
+		],
 		"webviewScript": ""
 	},
 	"links": [
@@ -110,7 +194,10 @@
 					"title": "畢業專區",
 					"url": "https://aca.nutc.edu.tw/p/412-1015-12361.php"
 				},
-				{ "title": "雲端租屋生活網", "url": "https://house.nfu.edu.tw/NTCUST" },
+				{
+					"title": "雲端租屋生活網",
+					"url": "https://house.nfu.edu.tw/NTCUST"
+				},
 				{
 					"title": "獎助生及兼任助理專區",
 					"url": "https://student.nutc.edu.tw/p/412-1020-9660.php"
@@ -128,7 +215,12 @@
 		{
 			"title": "就業服務",
 			"style": "list",
-			"items": [{ "title": "青年發展署", "url": "https://www.yda.gov.tw/" }]
+			"items": [
+				{
+					"title": "青年發展署",
+					"url": "https://www.yda.gov.tw/"
+				}
+			]
 		}
 	]
 }
