@@ -1,6 +1,7 @@
 {
 	"schoolId": "nkust.edu.tw",
 	"schoolName": "國立高雄科技大學",
+	"version": 2026040101,
 	"logoPath": "https://www.nkust.edu.tw/var/file/0/1000/img/513/182513897.png",
 	"calendar": {
 		"type": "pdf",

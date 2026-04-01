@@ -1,6 +1,7 @@
 {
 	"schoolId": "nutc.edu.tw",
 	"schoolName": "國立臺中科技大學",
+	"version": 2026040101,
 	"logoPath": "https://www.nutc.edu.tw/var/file/0/1000/msys_1000_7982359_54786.png",
 	"calendar": {
 		"type": "pdf",

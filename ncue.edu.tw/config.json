@@ -1,6 +1,7 @@
 {
 	"schoolId": "ncue.edu.tw",
 	"schoolName": "彰化師範大學",
+	"version": 2026040101,
 	"logoPath": "https://www.ncue.edu.tw/var/file/0/1000/img/85/416208730.jpg",
 	"calendar": {
 		"type": "pdf",
