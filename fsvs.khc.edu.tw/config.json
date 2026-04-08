@@ -10,18 +10,18 @@
     "entryUrl": "https://fsvs-khc.k12ea.gov.tw/SCH_UI/",
     "successIndicators": [
       {
-        "type": "exact",
-        "value": "https://fsvs-khc.k12ea.gov.tw/SCH_UI/Main.aspx"
-      },
-      {
         "type": "contains",
-        "value": "/Main.aspx"
+        "value": "fsvs-khc.k12ea.gov.tw/SCH_UI/Main.aspx"
       }
     ],
     "loginIndicators": [
       {
         "type": "contains",
-        "value": "Login.aspx"
+        "value": "Login"
+      },
+      {
+        "type": "contains",
+        "value": "fsvs-khc.k12ea.gov.tw/SCH_UI"
       }
     ],
     "usernameSelector": "UserId",
@@ -29,7 +29,7 @@
     "submitSelector": "BtnLogin",
     "autoFill": true,
     "autoSubmit": true,
-    "verifyScript": "(function() {\n    if (window._hasAuthSuccess) return;\n\n    var checkAuth = function(doc) {\n        var logoutBtn = doc.querySelector('a[id*=\"Logout\"], button[id*=\"Logout\"], a[href*=\"Logout\"], .btn-logout');\n        var userIn = doc.querySelector('.user-info, #userInfo, .login_name, span[id*=\"Name\"]');\n        \n        if (logoutBtn || userIn) return true;\n\n        var iframes = doc.querySelectorAll('iframe');\n        for (var i = 0; i < iframes.length; i++) {\n            try {\n                var frameDoc = iframes[i].contentDocument || iframes[i].contentWindow.document;\n                if (checkAuth(frameDoc)) return true;\n            } catch (e) {}\n        }\n        return false;\n    };\n\n    if (checkAuth(document)) {\n        window._hasAuthSuccess = true;\n        window.mobileApp.postMessage({ \n            detail: { type: 'AUTH_SUCCESS' } \n        });\n    }\n})();"
+    "verifyScript": "(function () {\n try {\n var currentUrl = location.href;\n if (currentUrl.indexOf('SSO/Main.aspx') !== -1) {\n var links = document.querySelectorAll('a');\n var foundTarget = false;\n for (var i = 0; i < links.length; i++) {\n var text = links[i].textContent.trim();\n if (text.indexOf('修課紀錄') !== -1 || text.indexOf('校務系統') !== -1) {\n foundTarget = true;\n break;\n }\n }\n var bridge = window.mobileApp || (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.mobileApp);\n if (bridge) {\n bridge.postMessage({ detail: { type: 'AUTH_SUCCESS' }});\n }\n }\n } catch (e) {}\n})();"
   },
   "schedule": {
     "syncMode": "manual",
@@ -71,22 +71,22 @@
       }
     ],
     "switchScript": "",
-    "parseScript": "(function() {\n  if (window.isProcessing) return;\n\n  var container = document.getElementById('TabPanel2');\n  var table = container ? container.querySelector('table') : null;\n  if (!table) return;\n\n  window.isProcessing = true;\n  var result = [];\n  var slotMap = ['1', '2', '3', '4', '5', '6', '7', '8'];\n\n  for (var k = 0; k < slotMap.length; k++) {\n    result.push({\n      slot: slotMap[k],\n      days: [{}, {}, {}, {}, {}]\n    });\n  }\n\n  var rows = table.querySelectorAll('tbody tr');\n  var dataIndex = 0;\n\n  for (var i = 0; i < rows.length; i++) {\n    var tr = rows[i];\n    var cols = tr.querySelectorAll('td.course-cell');\n\n    if (cols.length >= 5 && dataIndex < result.length) {\n      var currentSlot = result[dataIndex];\n     \n      for (var d = 0; d < 5; d++) {\n        var cell = cols[d];\n        var div = cell.querySelector('.course-text');\n        var text = div ? div.innerText.trim() : cell.innerText.trim();\n\n        if (text.length > 0) {\n          currentSlot.days[d] = {\n            name: text,\n            room: '',\n            teacher: ''\n          };\n        }\n      }\n      dataIndex++;\n    }\n  }\n\n  if (window.mobileApp) {\n    window.mobileApp.postMessage({\n      detail: { type: 'DATA_SUCCESS', payload: result }\n    });\n  }\n})();",
-    "manualParseScript": "(function() {\n  var table = document.querySelector('.table-list, #my-course-table, table');\n  if (!table) {\n    window.mobileApp.postMessage({ \n      detail: { type: 'ERROR', message: '畫面上找不到課表表格，請確認是否已點擊查詢。' } \n    });\n    return;\n  }\n\n  if (window._hasSentSched) return;\n  window._hasSentSched = true;\n\n  var rows = table.querySelectorAll('tr:not(:first-child)');\n  var result = [];\n\n  // 亞昕系統通常前 8 列為課表\n  for (var i = 0; i < 8; i++) {\n    var tr = rows[i];\n    var days = [];\n\n    if (tr) {\n      // 排除第一欄（節次標籤），抓取後續 7 欄（週一至週日）\n      var tds = tr.querySelectorAll('td:not(:first-child)');\n      for (var j = 0; j < 7; j++) {\n        var c = tds[j];\n        if (c && c.innerText.trim()) {\n          var l = c.innerText.trim().split('\\n');\n          days.push({\n            subject: l[0] || '',\n            room: l[1] || '',\n            teacher: l[2] || ''\n          });\n        } else {\n          days.push({});\n        }\n      }\n    } else {\n      // 如果表格列數不足 8 列，補齊空列以符合 timeSlots 長度\n      for (var k = 0; k < 7; k++) days.push({});\n    }\n\n    result.push({\n      slot: (i + 1).toString(),\n      days: days\n    });\n  }\n\n  window.mobileApp.postMessage({ \n    detail: { type: 'DATA_SUCCESS', payload: result } \n  });\n})();"
+    "parseScript": "(function() {\n if (window.isProcessing) return;\n\n var container = document.getElementById('TabPanel2');\n var table = container ? container.querySelector('table') : null;\n if (!table) return;\n\n window.isProcessing = true;\n var result = [];\n var slotMap = ['1', '2', '3', '4', '5', '6', '7', '8'];\n\n for (var k = 0; k < slotMap.length; k++) {\n result.push({\n slot: slotMap[k],\n days: [{}, {}, {}, {}, {}]\n });\n }\n\n var rows = table.querySelectorAll('tbody tr');\n var dataIndex = 0;\n\n for (var i = 0; i < rows.length; i++) {\n var tr = rows[i];\n var cols = tr.querySelectorAll('td.course-cell');\n\n if (cols.length >= 5 && dataIndex < result.length) {\n var currentSlot = result[dataIndex];\n \n for (var d = 0; d < 5; d++) {\n var cell = cols[d];\n var div = cell.querySelector('.course-text');\n var text = div ? div.innerText.trim() : cell.innerText.trim();\n\n if (text.length > 0) {\n currentSlot.days[d] = {\n name: text,\n room: '',\n teacher: ''\n };\n }\n }\n dataIndex++;\n }\n }\n\n if (window.mobileApp) {\n window.mobileApp.postMessage({\n detail: { type: 'DATA_SUCCESS', payload: result }\n });\n }\n})();",
+    "manualParseScript": "(function() {\n var table = document.querySelector('.table-list, #my-course-table, table');\n if (!table) {\n window.mobileApp.postMessage({ \n detail: { type: 'ERROR', message: '畫面上找不到課表表格，請確認是否已點擊查詢。' } \n });\n return;\n }\n\n if (window._hasSentSched) return;\n window._hasSentSched = true;\n\n var rows = table.querySelectorAll('tr:not(:first-child)');\n var result = [];\n\n // 亞昕系統通常前 8 列為課表\n for (var i = 0; i < 8; i++) {\n var tr = rows[i];\n var days = [];\n\n if (tr) {\n // 排除第一欄（節次標籤），抓取後續 7 欄（週一至週日）\n var tds = tr.querySelectorAll('td:not(:first-child)');\n for (var j = 0; j < 7; j++) {\n var c = tds[j];\n if (c && c.innerText.trim()) {\n var l = c.innerText.trim().split('\\n');\n days.push({\n subject: l[0] || '',\n room: l[1] || '',\n teacher: l[2] || ''\n });\n } else {\n days.push({});\n }\n }\n } else {\n // 如果表格列數不足 8 列，補齊空列以符合 timeSlots 長度\n for (var k = 0; k < 7; k++) days.push({});\n }\n\n result.push({\n slot: (i + 1).toString(),\n days: days\n });\n }\n\n window.mobileApp.postMessage({ \n detail: { type: 'DATA_SUCCESS', payload: result } \n });\n})();"
   },
   "score": {
     "enabled": true,
     "mode": "webview",
-    "fetchMode": "by_term",
-    "entryUrl": "https://fsvs-khc.k12ea.gov.tw/SCH_UI/SSO/SIndex.aspx",
+    "fetchMode": "all",
+    "entryUrl": "https://fsvs-khc.k12ea.gov.tw/SCH_UI/SSO/SIndex.aspx?AsParam=X0Z3UzJuJWU0JWJlJWJkJWU4JWFiJWJkJWU3JWI1JTk0JWU5JThkJTg1ZkxUVWtPVyUxN28lN2QlN2MlMGQlN2IlMDMlMDIlN2IlMDElMDIlMTZXV1o5dTIlM2MlMjc4MyUxNSVlNSVhZCU4OSVlNyU5NCVhYw%3D%3D",
     "targetUrlIndicators": [
       {
         "type": "contains",
         "value": "SIndex"
       }
     ],
-    "switchScript": "(function() {\n    var yr = document.querySelector('select[id*=\"ddl_year\"], #ddl_year');\n    var sm = document.querySelector('select[id*=\"ddl_sem\"], #ddl_sem');\n    var btn = document.querySelector('input[id*=\"btn_search\"], #btn_search, #btnQuery');\n\n    if (yr && sm && btn) {\n        var targetYr = '{{TARGET_YEAR}}';\n        var targetSm = '{{TARGET_SEM}}';\n\n       \n        if (yr.value !== targetYr || sm.value !== targetSm) {\n            if (window._swLock && (Date.now() - window._swLock < 3000)) return;\n            window._swLock = Date.now();\n\n            yr.value = targetYr;\n            sm.value = targetSm;\n\n           \n            setTimeout(function() {\n                btn.click();\n            }, 500);\n        }\n    }\n})();",
-    "parseScript": "(function() {\n    \n    var findTargetTable = function(doc) {\n        \n        var allTables = doc.querySelectorAll('table');\n        for (var i = 0; i < allTables.length; i++) {\n            if (allTables[i].innerText.indexOf('第一次評量') > -1) {\n                return allTables[i];\n            }\n        }\n        \n        \n        var iframes = doc.querySelectorAll('iframe');\n        for (var j = 0; j < iframes.length; j++) {\n            try {\n                var frameDoc = iframes[j].contentDocument || iframes[j].contentWindow.document;\n                var result = findTargetTable(frameDoc);\n                if (result) return result;\n            } catch (e) {\n                \n            }\n        }\n        return null;\n    };\n\n    var target = findTargetTable(document);\n\n    if (!target) {\n        console.error(\"【錯誤】依然找不到表格。請確認：\\n1. 畫面上是否真的出現了成績單？\\n2. 是否有跳出新的視窗？\");\n        return;\n    }\n\n    console.log(\"成功找到表格！開始解析資料...\");\n\n    var res = [];\n    var rows = target.querySelectorAll('tr');\n    \n    rows.forEach(function(tr) {\n        var tds = tr.querySelectorAll('td');\n        \n        if (tds.length >= 10) {\n            var subject = tds[0].innerText.trim();\n            var credit = tds[1].innerText.trim();\n            var termScore = tds[8].innerText.trim(); \n            \n            \n            if (subject && subject !== \"科目\" && !isNaN(parseInt(credit))) {\n                var scoreNum = parseInt(termScore);\n                var isPass = !isNaN(scoreNum) ? scoreNum >= 60 : false;\n                \n                res.push({\n                    term: '{{TARGET_YEAR}}-{{TARGET_SEM}}',\n                    subject: subject,\n                    credit: credit,\n                    score: termScore,\n                    isPass: isPass,\n                    status: isPass ? '及格' : '不及格'\n                });\n            }\n        }\n    });\n\n    if (res.length > 0) {\n        console.table(res);\n        if (window.mobileApp) {\n            window.mobileApp.postMessage({ detail: { type: 'DATA_SUCCESS', payload: res } });\n        }\n    } else {\n        console.warn(\"找到表格，但抓不到資料列，請檢查欄位索引。\");\n    }\n})();",
+    "switchScript": "(function() {\n var yr = document.querySelector('select[id*=\"ddl_year\"], #ddl_year');\n var sm = document.querySelector('select[id*=\"ddl_sem\"], #ddl_sem');\n var btn = document.querySelector('input[id*=\"btn_search\"], #btn_search, #btnQuery');\n\n if (yr && sm && btn) {\n var targetYr = '{{TARGET_YEAR}}';\n var targetSm = '{{TARGET_SEM}}';\n\n \n if (yr.value !== targetYr || sm.value !== targetSm) {\n if (window._swLock && (Date.now() - window._swLock < 3000)) return;\n window._swLock = Date.now();\n\n yr.value = targetYr;\n sm.value = targetSm;\n\n \n setTimeout(function() {\n btn.click();\n }, 500);\n }\n }\n})();",
+    "parseScript": "(function() {\n var findInAllContexts = function(selector, callback) {\n var result = callback(document.querySelector(selector), document);\n if (result) return result;\n\n var iframes = document.querySelectorAll('iframe');\n for (var i = 0; i < iframes.length; i++) {\n try {\n var fDoc = iframes[i].contentDocument || iframes[i].contentWindow.document;\n result = callback(fDoc.querySelector(selector), fDoc);\n if (result) return result;\n } catch (e) {}\n }\n return null;\n };\n\n var termLabel = findInAllContexts('select', function(sel, doc) {\n var allSelects = doc.querySelectorAll('select');\n for (var i = 0; i < allSelects.length; i++) {\n var opt = allSelects[i].options[allSelects[i].selectedIndex];\n if (opt && [\"一上\", \"一下\", \"二上\", \"二下\", \"三上\", \"三下\"].indexOf(opt.text) > -1) {\n return opt.text;\n }\n }\n return null;\n }) || \"未知學期\";\n\n var targetTable = findInAllContexts('table', function(table, doc) {\n var allTables = doc.querySelectorAll('table');\n for (var i = 0; i < allTables.length; i++) {\n if (allTables[i].innerText.indexOf('第一次評量') > -1) {\n return allTables[i];\n }\n }\n return null;\n });\n\n if (!targetTable) return;\n\n var res = [];\n var rows = targetTable.querySelectorAll('tr');\n rows.forEach(function(tr) {\n var tds = tr.querySelectorAll('td');\n if (tds.length >= 8) {\n var subject = tds[0].innerText.trim();\n var credit = tds[1].innerText.trim();\n var score = tds[tds.length - 1].innerText.trim();\n \n if (subject && subject !== \"科目\" && !isNaN(parseInt(credit))) {\n var scoreNum = parseInt(score);\n var isPass = !isNaN(scoreNum) ? scoreNum >= 60 : false;\n res.push({\n term: termLabel,\n subject: subject,\n credit: credit,\n score: score,\n isPass: isPass,\n status: isPass ? '及格' : '不及格'\n });\n }\n }\n });\n\n if (res.length > 0 && window.mobileApp) {\n window.mobileApp.postMessage({ \n detail: { type: 'DATA_SUCCESS', payload: res } \n });\n }\n})();",
     "sessionExpiredIndicators": [
       {
         "type": "contains",
@@ -126,4 +126,192 @@
         "value": "https://www.fsvs.khc.edu.tw/p/"
       }
     ],
-    "webviewScript": "if (window._hasParsedNews) return;\nvar rows = document.querySelectorAll('.table-list tbody tr, table tr');\nvar payload = [];\nif (rows.length > 0) {\n    rows.forEach(function(tr) {\n        var dateEl = tr.querySelector('.d-txt, .mdate') || (tr.cells ? tr.
+    "webviewScript": "if (window._hasParsedNews) return;\nvar rows = document.querySelectorAll('.table-list tbody tr, table tr');\nvar payload = [];\nif (rows.length > 0) {\n rows.forEach(function(tr) {\n var dateEl = tr.querySelector('.d-txt, .mdate') || (tr.cells ? tr.cells[0] : null);\n var titleContainer = tr.querySelector('.mtitle') || (tr.cells ? tr.cells[1] : null);\n var linkEl = titleContainer ? titleContainer.querySelector('a') : null;\n if (titleContainer) {\n var titleText = titleContainer.textContent.trim();\n if (titleText && titleText !== \"標題\" && titleText !== \"主題\") {\n payload.push({\n title: titleText,\n department: \"校內公告\",\n date: dateEl ? dateEl.textContent.trim() : '',\n link: linkEl ? linkEl.href : window.location.href\n });\n }\n }\n });\n if (payload.length > 0) {\n window._hasParsedNews = true;\n window.mobileApp.postMessage({ \n detail: { \n type: 'NEWS_SUCCESS', \n payload: payload \n } \n });\n }\n}"
+  },
+  "mail": {
+    "enabled": false,
+    "mode": "webview",
+    "apiUrl": "",
+    "apiMethod": "GET",
+    "apiHeaders": "{}",
+    "apiBody": "",
+    "apiRequestScript": "",
+    "parseScript": "return [];",
+    "webviewUrl": "",
+    "targetUrlIndicators": [],
+    "webviewScript": ""
+  },
+  "links": [
+    {
+      "title": "常用入口與雲端服務",
+      "style": "pill",
+      "items": [
+        {
+          "title": "校務系統（含學習歷程）",
+          "url": "https://fsvs-khc.k12ea.gov.tw/SCH_UI/"
+        },
+        {
+          "title": "學生信箱",
+          "url": "https://mail.google.com/a/fsvs.khc.edu.tw/"
+        },
+        {
+          "title": "台灣銀行-學雜費",
+          "url": "https://school.bot.com.tw/newTwbank/StudentLogin.aspx?id=Student"
+        },
+        {
+          "title": "公文系統",
+          "url": "https://www.cloudop.tw/"
+        },
+        {
+          "title": "雲端差勤系統",
+          "url": "https://pk12.cloudhr.tw/"
+        }
+      ]
+    },
+    {
+      "title": "課程與學習",
+      "style": "pill",
+      "items": [
+        {
+          "title": "播客行動學習",
+          "url": "http://podcast3.fsvs.khc.edu.tw/"
+        },
+        {
+          "title": "Easy test線上測驗平台",
+          "url": "https://easytest.fsvs.khc.edu.tw/"
+        },
+        {
+          "title": "華藝電子書",
+          "url": "https://www.airitibooks.com/Home/Index"
+        }
+      ]
+    },
+    {
+      "title": "校園生活",
+      "style": "pill",
+      "items": [
+        {
+          "title": "公物請修單",
+          "url": "https://docs.google.com/forms/d/e/1FAIpQLScCwcM6y484o_TtyphXCiX9YOuX6T7Pq9ln3L-TSFrUR21LaA/viewform"
+        },
+        {
+          "title": "重補修",
+          "url": "https://www.fsvs.khc.edu.tw/p/405-1003-35578,c2889.php?Lang=zh-tw"
+        },
+        {
+          "title": "班級課表",
+          "url": "https://www.fsvs.khc.edu.tw/p/412-1003-2898.php?Lang=zh-tw"
+        },
+        {
+          "title": "教務處公告",
+          "url": "https://www.fsvs.khc.edu.tw/p/403-1003-89.php?Lang=zh-tw"
+        },
+        {
+          "title": "課程資訊教師",
+          "url": "https://www.fsvs.khc.edu.tw/p/412-1003-3307.php?Lang=zh-tw"
+        },
+        {
+          "title": "新生入學",
+          "url": "https://www.fsvs.khc.edu.tw/p/412-1003-3788.php?Lang=zh-tw"
+        },
+        {
+          "title": "高三升學",
+          "url": "https://www.fsvs.khc.edu.tw/p/412-1003-3713.php?Lang=zh-tw"
+        }
+      ]
+    },
+    {
+      "title": "獎助學金及學雜費",
+      "style": "pill",
+      "items": [
+        {
+          "title": "學生就學貸款系統",
+          "url": "https://ssl.bok.com.tw/member/"
+        },
+        {
+          "title": "學雜費減免申請",
+          "url": "https://www.fsvs.khc.edu.tw/p/412-1003-3298.php?Lang=zh-tw"
+        },
+        {
+          "title": "獎助學金公告",
+          "url": "https://www.fsvs.khc.edu.tw/p/403-1003-717-1.php?Lang=zh-tw"
+        }
+      ]
+    },
+    {
+      "title": "行政單位",
+      "style": "pill",
+      "items": [
+        {
+          "title": "校長室",
+          "url": "https://www.fsvs.khc.edu.tw/p/412-1003-2189.php?Lang=zh-tw"
+        },
+        {
+          "title": "教務處",
+          "url": "https://www.fsvs.khc.edu.tw/p/403-1003-89.php?Lang=zh-tw"
+        },
+        {
+          "title": "學務處",
+          "url": "https://www.fsvs.khc.edu.tw/p/403-1003-90.php?Lang=zh-tw"
+        },
+        {
+          "title": "教官室",
+          "url": "https://www.fsvs.khc.edu.tw/p/412-1003-2709.php?Lang=zh-tw"
+        },
+        {
+          "title": "實習輔導處",
+          "url": "https://www.fsvs.khc.edu.tw/p/412-1003-777.php?Lang=zh-tw"
+        },
+        {
+          "title": "總務處",
+          "url": "https://www.fsvs.khc.edu.tw/p/412-1003-778.php?Lang=zh-tw"
+        },
+        {
+          "title": "輔導室",
+          "url": "https://www.fsvs.khc.edu.tw/p/412-1003-779.php?Lang=zh-tw"
+        },
+        {
+          "title": "圖書館",
+          "url": "https://www.fsvs.khc.edu.tw/p/412-1003-780.php?Lang=zh-tw"
+        },
+        {
+          "title": "進修部",
+          "url": "https://www.fsvs.khc.edu.tw/p/412-1003-781.php?Lang=zh-tw"
+        },
+        {
+          "title": "人事室",
+          "url": "https://www.fsvs.khc.edu.tw/p/412-1003-782.php?Lang=zh-tw"
+        },
+        {
+          "title": "技術教學中心",
+          "url": "https://vtedu.k12ea.gov.tw/nss/s/fsvstc/p/index"
+        }
+      ]
+    },
+    {
+      "title": "圖書與資訊服務",
+      "style": "list",
+      "items": [
+        {
+          "title": "館藏查詢",
+          "url": "https://lib.fsvs.khc.edu.tw/webopac"
+        },
+        {
+          "title": "中學生網站",
+          "url": "https://www.shs.edu.tw/"
+        }
+      ]
+    },
+    {
+      "title": "更多資訊",
+      "style": "pill",
+      "items": [
+        {
+          "title": "校園APP配置者",
+          "url": "https://www.instagram.com/huang_eric_ig?igsh=MXZvdHpvMXFuaHhjeg=="
+        }
+      ]
+    }
+  ],
+  "version": 2026040801
+}
