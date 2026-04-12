@@ -1,10 +1,10 @@
 {
   "schoolId": "fsvs.khc.edu.tw",
   "schoolName": "國立鳳山商工",
-  "logoPath": "https://scontent.ftpe3-2.fna.fbcdn.net/v/t39.30808-6/302890631_562569572326702_721436420575421088_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=MFWGX1W34NYQ7kNvwHkEeE7&_nc_oc=AdqGyygHwrbbV3doTgF35G0XTF1DL9pcKlT-JAQi3A8vRWEZNVi2cwrl2CiIL1_v_Tk&_nc_zt=23&_nc_ht=scontent.ftpe3-2.fna&_nc_gid=Ose1JKWC6hYsck-nY50xIA&_nc_ss=7a3a8&oh=00_Af3D_ukjWG4zlqK-lYdVMIdTJa48oejZSIMtaRRRJxnnIQ&oe=69D966A3",
+  "logoPath": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxdtlJnqzFK-ft9X2pElYAyJnFit0KPOlOYA&s34NYQ7kNvwHkEeE7&_nc_oc=AdqGyygHwrbbV3doTgF35G0XTF1DL9pcKlT-JAQi3A8vRWEZNVi2cwrl2CiIL1_v_Tk&_nc_zt=23&_nc_ht=scontent.ftpe3-2.fna&_nc_gid=Ose1JKWC6hYsck-nY50xIA&_nc_ss=7a3a8&oh=00_Af3D_ukjWG4zlqK-lYdVMIdTJa48oejZSIMtaRRRJxnnIQ&oe=69D966A3",
   "calendar": {
-    "type": "pdf",
-    "url": "https://www.fsvs.khc.edu.tw/var/file/3/1003/img/127/424762574.pdf"
+    "type": "web",
+    "url": "https://calendar.google.com/calendar/u/0/embed?src=fsvs.ks.edu.tw_ggkup0mc4ls6sndbtrjq4350ik@group.calendar.google.com&ctz=Asia/Taipei"
   },
   "auth": {
     "entryUrl": "https://fsvs-khc.k12ea.gov.tw/SCH_UI/",
@@ -24,18 +24,28 @@
         "value": "fsvs-khc.k12ea.gov.tw/SCH_UI"
       }
     ],
-    "usernameSelector": "UserId",
-    "passwordSelector": "Pswd",
-    "submitSelector": "BtnLogin",
+    "usernameSelector": "#UserId",
+    "passwordSelector": "#Pswd",
+    "submitSelector": "#BtnLogin",
     "autoFill": true,
     "autoSubmit": true,
-    "verifyScript": "(function () {\n try {\n var currentUrl = location.href;\n if (currentUrl.indexOf('SSO/Main.aspx') !== -1) {\n var links = document.querySelectorAll('a');\n var foundTarget = false;\n for (var i = 0; i < links.length; i++) {\n var text = links[i].textContent.trim();\n if (text.indexOf('修課紀錄') !== -1 || text.indexOf('校務系統') !== -1) {\n foundTarget = true;\n break;\n }\n }\n var bridge = window.mobileApp || (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.mobileApp);\n if (bridge) {\n bridge.postMessage({ detail: { type: 'AUTH_SUCCESS' }});\n }\n }\n } catch (e) {}\n})();"
+    "verifyScript": "(function () {\n  try {\n    var currentUrl = location.href;\n    if (currentUrl.indexOf('SSO/Main.aspx') !== -1) {\n      var links = document.querySelectorAll('a');\n      var foundTarget = false;\n      for (var i = 0; i < links.length; i++) {\n        var text = links[i].textContent.trim();\n        if (text.indexOf('修課紀錄') !== -1 || text.indexOf('校務系統') !== -1) {\n          foundTarget = true;\n          break;\n        }\n      }\n      var bridge = window.mobileApp || (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.mobileApp);\n      if (bridge) {\n        bridge.postMessage({ detail: { type: 'AUTH_SUCCESS' }});\n      }\n    }\n  } catch (e) {}\n})();"
   },
   "schedule": {
     "syncMode": "manual",
-    "entryUrl": "https://fsvs-khc.k12ea.gov.tw/SCH_UI/SSO/SIndex.aspx?AsParam=X0Z3UzJuJWU0JWJlJWJkJWU4JWFiJWJkJWU3JWI1JTk0JWU5JThkJTg1ZkxUVWtPVyUxN28lN2QlN2MlMGMlN2IlMDIlMDIlN2IlMDElMDIlMTZXV1o5dTIlM2MlMjc4MyUxNSVlNSVhZCU4OSVlNyU5NCVhYw",
-    "targetUrlIndicators": [],
-    "sessionExpiredIndicators": [],
+    "entryUrl": "https://fsvs-khc.k12ea.gov.tw/SCH_UI/C/CBS01.aspx",
+    "targetUrlIndicators": [
+      {
+        "type": "contains",
+        "value": "CBS01"
+      }
+    ],
+    "sessionExpiredIndicators": [
+      {
+        "type": "contains",
+        "value": "Login"
+      }
+    ],
     "timeSlots": [
       {
         "s": "1",
@@ -47,7 +57,7 @@
       },
       {
         "s": "3",
-        "t": "10:10~11:05"
+        "t": "10:10~11:00"
       },
       {
         "s": "4",
@@ -71,38 +81,26 @@
       }
     ],
     "switchScript": "",
-    "parseScript": "(function() {\n if (window.isProcessing) return;\n\n var container = document.getElementById('TabPanel2');\n var table = container ? container.querySelector('table') : null;\n if (!table) return;\n\n window.isProcessing = true;\n var result = [];\n var slotMap = ['1', '2', '3', '4', '5', '6', '7', '8'];\n\n for (var k = 0; k < slotMap.length; k++) {\n result.push({\n slot: slotMap[k],\n days: [{}, {}, {}, {}, {}]\n });\n }\n\n var rows = table.querySelectorAll('tbody tr');\n var dataIndex = 0;\n\n for (var i = 0; i < rows.length; i++) {\n var tr = rows[i];\n var cols = tr.querySelectorAll('td.course-cell');\n\n if (cols.length >= 5 && dataIndex < result.length) {\n var currentSlot = result[dataIndex];\n \n for (var d = 0; d < 5; d++) {\n var cell = cols[d];\n var div = cell.querySelector('.course-text');\n var text = div ? div.innerText.trim() : cell.innerText.trim();\n\n if (text.length > 0) {\n currentSlot.days[d] = {\n name: text,\n room: '',\n teacher: ''\n };\n }\n }\n dataIndex++;\n }\n }\n\n if (window.mobileApp) {\n window.mobileApp.postMessage({\n detail: { type: 'DATA_SUCCESS', payload: result }\n });\n }\n})();",
-    "manualParseScript": "(function() {\n var table = document.querySelector('.table-list, #my-course-table, table');\n if (!table) {\n window.mobileApp.postMessage({ \n detail: { type: 'ERROR', message: '畫面上找不到課表表格，請確認是否已點擊查詢。' } \n });\n return;\n }\n\n if (window._hasSentSched) return;\n window._hasSentSched = true;\n\n var rows = table.querySelectorAll('tr:not(:first-child)');\n var result = [];\n\n // 亞昕系統通常前 8 列為課表\n for (var i = 0; i < 8; i++) {\n var tr = rows[i];\n var days = [];\n\n if (tr) {\n // 排除第一欄（節次標籤），抓取後續 7 欄（週一至週日）\n var tds = tr.querySelectorAll('td:not(:first-child)');\n for (var j = 0; j < 7; j++) {\n var c = tds[j];\n if (c && c.innerText.trim()) {\n var l = c.innerText.trim().split('\\n');\n days.push({\n subject: l[0] || '',\n room: l[1] || '',\n teacher: l[2] || ''\n });\n } else {\n days.push({});\n }\n }\n } else {\n // 如果表格列數不足 8 列，補齊空列以符合 timeSlots 長度\n for (var k = 0; k < 7; k++) days.push({});\n }\n\n result.push({\n slot: (i + 1).toString(),\n days: days\n });\n }\n\n window.mobileApp.postMessage({ \n detail: { type: 'DATA_SUCCESS', payload: result } \n });\n})();"
+    "parseScript": "(function() {\n  if (window.isProcessing) return;\n\n  var container = document.getElementById('TabPanel2');\n  var table = container ? container.querySelector('table') : null;\n  if (!table) return;\n\n  window.isProcessing = true;\n  var result = [];\n  var slotMap = ['1', '2', '3', '4', '5', '6', '7', '8'];\n\n  for (var k = 0; k < slotMap.length; k++) {\n    result.push({\n      slot: slotMap[k],\n      days: [{}, {}, {}, {}, {}]\n    });\n  }\n\n  var rows = table.querySelectorAll('tbody tr');\n  var dataIndex = 0;\n\n  for (var i = 0; i < rows.length; i++) {\n    var tr = rows[i];\n    var cols = tr.querySelectorAll('td.course-cell');\n\n    if (cols.length >= 5 && dataIndex < result.length) {\n      var currentSlot = result[dataIndex];\n     \n      for (var d = 0; d < 5; d++) {\n        var cell = cols[d];\n        var div = cell.querySelector('.course-text');\n        var text = div ? div.innerText.trim() : cell.innerText.trim();\n\n        if (text.length > 0) {\n          currentSlot.days[d] = {\n            name: text,\n            room: '',\n            teacher: ''\n          };\n        }\n      }\n      dataIndex++;\n    }\n  }\n\n  if (window.mobileApp) {\n    window.mobileApp.postMessage({\n      detail: { type: 'DATA_SUCCESS', payload: result }\n    });\n  }\n})();",
+    "manualParseScript": "(function() {\n    if (window._hasSentData) return;\n\n    function getTableById(id) {\n        if (document.getElementById(id)) return document.getElementById(id);\n        const iframes = document.querySelectorAll('iframe');\n        for (let f of iframes) {\n            try {\n                const fDoc = f.contentDocument || f.contentWindow.document;\n                const target = fDoc.getElementById(id);\n                if (target) return target;\n            } catch (e) {}\n        }\n        return null;\n    }\n\n    const table = getTableById('GrdStd2');\n    if (!table) return;\n\n    window._hasSentData = true;\n\n    const result = [];\n    const rows = table.querySelectorAll('tr.tblContent');\n\n    rows.forEach(tr => {\n        const tds = Array.from(tr.querySelectorAll('td'));\n        if (tds.length < 6) return;\n\n        const slotVal = tds[0].innerText.trim();\n        if (!/^[1-8]$/.test(slotVal) && slotVal !== \"午休\") return;\n\n        const rowData = {\n            slot: slotVal,\n            days: []\n        };\n\n        for (let d = 1; d <= 7; d++) {\n            const cell = tds[d];\n            const box = cell ? cell.querySelector('.ctrlboxlessV') : null;\n\n            if (box) {\n                const info = Array.from(box.querySelectorAll('div')).map(el => el.innerText.trim()).filter(s => s !== \"\");\n                \n                if (info.length > 0) {\n                    const subject = info[0];\n                    let teacher = \"\";\n                    let roomParts = [];\n\n                    for (let i = 1; i < info.length; i++) {\n                        const text = info[i];\n                        if (text.includes(\"班\") || text.includes(\"教室\") || text.includes(\"電腦\")) {\n                            roomParts.push(text);\n                        } else if (teacher === \"\") {\n                            teacher = text;\n                        }\n                    }\n\n                    rowData.days.push({\n                        name: subject,\n                        room: roomParts.join(' '),\n                        teacher: teacher\n                    });\n                } else {\n                    rowData.days.push({});\n                }\n            } else {\n                rowData.days.push({});\n            }\n        }\n        result.push(rowData);\n    });\n\n    if (window.mobileApp && window.mobileApp.postMessage) {\n        window.mobileApp.postMessage({\n            detail: { type: 'DATA_SUCCESS', payload: result }\n        });\n    }\n\n    console.log(result);\n})();"
   },
   "score": {
     "enabled": true,
     "mode": "webview",
     "fetchMode": "all",
-    "entryUrl": "https://fsvs-khc.k12ea.gov.tw/SCH_UI/SSO/SIndex.aspx?AsParam=X0Z3UzJuJWU0JWJlJWJkJWU4JWFiJWJkJWU3JWI1JTk0JWU5JThkJTg1ZkxUVWtPVyUxN28lN2QlN2MlMGQlN2IlMDMlMDIlN2IlMDElMDIlMTZXV1o5dTIlM2MlMjc4MyUxNSVlNSVhZCU4OSVlNyU5NCVhYw%3D%3D",
+    "entryUrl": "https://fsvs-khc.k12ea.gov.tw/SCH_UI/B/BBS01.aspx",
     "targetUrlIndicators": [
       {
         "type": "contains",
-        "value": "SIndex"
+        "value": "BBS01"
       }
     ],
-    "switchScript": "(function() {\n var yr = document.querySelector('select[id*=\"ddl_year\"], #ddl_year');\n var sm = document.querySelector('select[id*=\"ddl_sem\"], #ddl_sem');\n var btn = document.querySelector('input[id*=\"btn_search\"], #btn_search, #btnQuery');\n\n if (yr && sm && btn) {\n var targetYr = '{{TARGET_YEAR}}';\n var targetSm = '{{TARGET_SEM}}';\n\n \n if (yr.value !== targetYr || sm.value !== targetSm) {\n if (window._swLock && (Date.now() - window._swLock < 3000)) return;\n window._swLock = Date.now();\n\n yr.value = targetYr;\n sm.value = targetSm;\n\n \n setTimeout(function() {\n btn.click();\n }, 500);\n }\n }\n})();",
-    "parseScript": "(function() {\n var findInAllContexts = function(selector, callback) {\n var result = callback(document.querySelector(selector), document);\n if (result) return result;\n\n var iframes = document.querySelectorAll('iframe');\n for (var i = 0; i < iframes.length; i++) {\n try {\n var fDoc = iframes[i].contentDocument || iframes[i].contentWindow.document;\n result = callback(fDoc.querySelector(selector), fDoc);\n if (result) return result;\n } catch (e) {}\n }\n return null;\n };\n\n var termLabel = findInAllContexts('select', function(sel, doc) {\n var allSelects = doc.querySelectorAll('select');\n for (var i = 0; i < allSelects.length; i++) {\n var opt = allSelects[i].options[allSelects[i].selectedIndex];\n if (opt && [\"一上\", \"一下\", \"二上\", \"二下\", \"三上\", \"三下\"].indexOf(opt.text) > -1) {\n return opt.text;\n }\n }\n return null;\n }) || \"未知學期\";\n\n var targetTable = findInAllContexts('table', function(table, doc) {\n var allTables = doc.querySelectorAll('table');\n for (var i = 0; i < allTables.length; i++) {\n if (allTables[i].innerText.indexOf('第一次評量') > -1) {\n return allTables[i];\n }\n }\n return null;\n });\n\n if (!targetTable) return;\n\n var res = [];\n var rows = targetTable.querySelectorAll('tr');\n rows.forEach(function(tr) {\n var tds = tr.querySelectorAll('td');\n if (tds.length >= 8) {\n var subject = tds[0].innerText.trim();\n var credit = tds[1].innerText.trim();\n var score = tds[tds.length - 1].innerText.trim();\n \n if (subject && subject !== \"科目\" && !isNaN(parseInt(credit))) {\n var scoreNum = parseInt(score);\n var isPass = !isNaN(scoreNum) ? scoreNum >= 60 : false;\n res.push({\n term: termLabel,\n subject: subject,\n credit: credit,\n score: score,\n isPass: isPass,\n status: isPass ? '及格' : '不及格'\n });\n }\n }\n });\n\n if (res.length > 0 && window.mobileApp) {\n window.mobileApp.postMessage({ \n detail: { type: 'DATA_SUCCESS', payload: res } \n });\n }\n})();",
+    "switchScript": "(function () {\n    // 1. 設定目標學期（App 應將 {{TARGET_TERM}} 替換為「二下」或「一上」等）\n    var targetTerm = '{{TARGET_TERM}}'.replace('-', '').trim();\n    \n    // 2. 防重複執行鎖（避免在頁面載入中重複觸發導致死循環）\n    if (window._isSwitchingLock && (Date.now() - window._isSwitchingLock < 3000)) return;\n    window._isSwitchingLock = Date.now();\n\n    // 3. 穿透搜尋函數（支援 iframe 結構）\n    function getElement(selector) {\n        let el = document.querySelector(selector);\n        if (el) return el;\n        for (let i = 0; i < window.frames.length; i++) {\n            try {\n                let fDoc = window.frames[i].document;\n                el = fDoc.querySelector(selector);\n                if (el) return el;\n            } catch (e) {}\n        }\n        return null;\n    }\n\n    // 定位選單\n    var sel = getElement('#DdlStd_yearterm_ddl') || getElement('select[name=\"DdlStd_yearterm_ddl\"]');\n\n    if (!sel) {\n        console.error(\"找不到學期選單 DdlStd_yearterm_ddl\");\n        window._isSwitchingLock = 0;\n        return;\n    }\n\n    var currentText = sel.options[sel.selectedIndex].text.trim();\n\n    // --- 判斷邏輯 ---\n\n    // A. 已經在目標學期 -> 執行解析資料\n    if (currentText.includes(targetTerm) || targetTerm.includes(currentText)) {\n        console.log(\"目前已在目標學期：\" + currentText + \"，準備解析資料...\");\n        if (typeof parseAndSendData === \"function\") {\n            parseAndSendData(currentText);\n        } else {\n            console.log(\"請配合成績解析腳本使用。\");\n        }\n    } \n    // B. 需要切換學期 -> 執行自動切換\n    else {\n        var foundIndex = -1;\n        for (var i = 0; i < sel.options.length; i++) {\n            var optText = sel.options[i].text.trim();\n            if (optText.includes(targetTerm) || targetTerm.includes(optText)) {\n                foundIndex = i;\n                break;\n            }\n        }\n\n        if (foundIndex !== -1) {\n            console.log(\"正在從 \" + currentText + \" 切換至 \" + targetTerm);\n            sel.selectedIndex = foundIndex;\n\n            // 觸發 ASP.NET 內建的 ddlchange(this) 邏輯\n            var onchangeAttr = sel.getAttribute('onchange');\n            if (onchangeAttr) {\n                // 強制將 this 綁定在 sel 執行，確保觸發 __doPostBack\n                new Function(onchangeAttr).call(sel);\n            } else if (typeof sel.onchange === 'function') {\n                sel.onchange();\n            } else {\n                // 備援方案：手動派發 Change 事件\n                var evt = document.createEvent(\"HTMLEvents\");\n                evt.initEvent(\"change\", true, true);\n                sel.dispatchEvent(evt);\n            }\n        } else {\n            console.error(\"選單中找不到目標學期：\" + targetTerm);\n            window._isSwitchingLock = 0;\n        }\n    }\n})();",
+    "parseScript": "(function() {\n    // 1. 防止重複執行\n    if (window._hasParsedGrades) return;\n\n    var findInAllContexts = function(selector, callback) {\n        var result = callback(document.querySelector(selector), document);\n        if (result) return result;\n\n        var frames = document.querySelectorAll('iframe, frame');\n        for (var i = 0; i < frames.length; i++) {\n            try {\n                var fDoc = frames[i].contentDocument || frames[i].contentWindow.document;\n                result = callback(fDoc.querySelector(selector), fDoc);\n                if (result) return result;\n            } catch (e) {}\n        }\n        return null;\n    };\n\n    // 2. 精確獲取當前選中的學期標籤 (如：二下)\n    var termLabel = findInAllContexts('#DdlStd_yearterm_ddl', function(sel) {\n        if (sel && sel.options[sel.selectedIndex]) {\n            return sel.options[sel.selectedIndex].text.trim();\n        }\n        return null;\n    }) || \"未知學期\";\n\n    // 3. 定位成績表格 (以包含 \"科目\" 與 \"學分\" 的表格為準)\n    var targetTable = findInAllContexts('table', function(table, doc) {\n        var allTables = doc.querySelectorAll('table');\n        for (var i = 0; i < allTables.length; i++) {\n            var text = allTables[i].innerText;\n            // 同時檢查 科目 與 學期/期末 關鍵字，確保抓對表格\n            if (text.indexOf('科目') > -1 && (text.indexOf('學期成績') > -1 || text.indexOf('評量') > -1)) {\n                return allTables[i];\n            }\n        }\n        return null;\n    });\n\n    if (!targetTable) {\n        console.error(\"找不到成績表格\");\n        return;\n    }\n\n    var res = [];\n    var rows = targetTable.querySelectorAll('tr');\n\n    rows.forEach(function(tr) {\n        var tds = tr.querySelectorAll('td');\n        // 鳳商表格通常 科目在第0欄，學分在第1欄，學期成績在最後一欄\n        if (tds.length >= 5) { \n            var subject = tds[0].innerText.trim();\n            var credit = tds[1].innerText.trim();\n            // 抓取最後一欄作為學期成績\n            var scoreText = tds[tds.length - 1].innerText.trim();\n            \n            // 過濾掉表頭列與空列\n            if (subject && subject !== \"科目\" && !isNaN(parseFloat(credit))) {\n                var scoreNum = parseFloat(scoreText);\n                var isPass = !isNaN(scoreNum) ? scoreNum >= 60 : false;\n\n                // 處理非數字成績 (如：未結算)\n                var displayScore = scoreText === \"\" ? \"未結算\" : scoreText;\n\n                res.push({\n                    term: termLabel,       // 學期 (二下)\n                    subject: subject,      // 科目名稱\n                    credit: credit,        // 學分數\n                    score: displayScore,   // 分數\n                    isPass: isPass,        // 是否及格\n                    status: isPass ? '及格' : (isNaN(scoreNum) ? '-' : '不及格')\n                });\n            }\n        }\n    });\n\n    // 4. 回傳 App\n    if (res.length > 0) {\n        window._hasParsedGrades = true;\n        console.log(\"解析成功，共 \" + res.length + \" 筆成績：\", res);\n\n        if (window.mobileApp && typeof window.mobileApp.postMessage === 'function') {\n            // 強制轉字串，避免 App 接收端出現 undefined\n            window.mobileApp.postMessage(JSON.stringify({ \n                detail: { type: 'DATA_SUCCESS', payload: res } \n            }));\n        }\n    }\n})();",
     "sessionExpiredIndicators": [
       {
         "type": "contains",
         "value": "Login.aspx"
-      },
-      {
-        "type": "contains",
-        "value": "Default.aspx"
-      },
-      {
-        "type": "contains",
-        "value": "SessionTimeout"
-      },
-      {
-        "type": "contains",
-        "value": "AccessDenied"
       }
     ]
   },
@@ -126,7 +124,7 @@
         "value": "https://www.fsvs.khc.edu.tw/p/"
       }
     ],
-    "webviewScript": "if (window._hasParsedNews) return;\nvar rows = document.querySelectorAll('.table-list tbody tr, table tr');\nvar payload = [];\nif (rows.length > 0) {\n rows.forEach(function(tr) {\n var dateEl = tr.querySelector('.d-txt, .mdate') || (tr.cells ? tr.cells[0] : null);\n var titleContainer = tr.querySelector('.mtitle') || (tr.cells ? tr.cells[1] : null);\n var linkEl = titleContainer ? titleContainer.querySelector('a') : null;\n if (titleContainer) {\n var titleText = titleContainer.textContent.trim();\n if (titleText && titleText !== \"標題\" && titleText !== \"主題\") {\n payload.push({\n title: titleText,\n department: \"校內公告\",\n date: dateEl ? dateEl.textContent.trim() : '',\n link: linkEl ? linkEl.href : window.location.href\n });\n }\n }\n });\n if (payload.length > 0) {\n window._hasParsedNews = true;\n window.mobileApp.postMessage({ \n detail: { \n type: 'NEWS_SUCCESS', \n payload: payload \n } \n });\n }\n}"
+    "webviewScript": "if (window._hasParsedNews) return;\nvar rows = document.querySelectorAll('.table-list tbody tr, table tr');\nvar payload = [];\nif (rows.length > 0) {\n    rows.forEach(function(tr) {\n        var dateEl = tr.querySelector('.d-txt, .mdate') || (tr.cells ? tr.cells[0] : null);\n        var titleContainer = tr.querySelector('.mtitle') || (tr.cells ? tr.cells[1] : null);\n        var linkEl = titleContainer ? titleContainer.querySelector('a') : null;\n        if (titleContainer) {\n            var titleText = titleContainer.textContent.trim();\n            if (titleText && titleText !== \"標題\" && titleText !== \"主題\") {\n                payload.push({\n                    title: titleText,\n                    department: \"校內公告\",\n                    date: dateEl ? dateEl.textContent.trim() : '',\n                    link: linkEl ? linkEl.href : window.location.href\n                });\n            }\n        }\n    });\n    if (payload.length > 0) {\n        window._hasParsedNews = true;\n        window.mobileApp.postMessage({ \n            detail: { \n                type: 'NEWS_SUCCESS', \n                payload: payload \n            } \n        });\n    }\n}"
   },
   "mail": {
     "enabled": false,
@@ -290,7 +288,7 @@
     },
     {
       "title": "圖書與資訊服務",
-      "style": "list",
+      "style": "pill",
       "items": [
         {
           "title": "館藏查詢",
@@ -313,5 +311,5 @@
       ]
     }
   ],
-  "version": 2026040801
+  "version": 2026040101
 }
